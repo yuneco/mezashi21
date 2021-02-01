@@ -49,7 +49,17 @@ export const loadSvg = async (
   const resolution = window.devicePixelRatio
   const promise = new Promise<PIXI.Texture>((resolve, reject) => {
     el.addEventListener('load', () => {
-      resizeImgElem(el, w && w * resolution, h && h * resolution)
+      if (!w && !h) {
+        // サイズ指定がない場合
+        resizeImgElem(
+          el,
+          el.naturalWidth * resolution,
+          el.naturalHeight * resolution
+        )
+      } else {
+        // w,hの少なくとも一方が指定されている場合
+        resizeImgElem(el, w && w * resolution, h && h * resolution)
+      }
       const tx = PIXI.Texture.from(el, { resolution })
       resolve(tx)
     })
