@@ -15,3 +15,10 @@ export default defineComponent({
   }
 });
 </script>
+
+<style lang="scss" scoped>
+.home {
+  position: inherit;
+  height: 100%;
+}
+</style>
