@@ -1,72 +1,55 @@
 import * as PIXI from 'pixi.js'
-import { loadSvg } from '@/logics/loadImgs'
-import OutlineFilter from '@/filters/OutlineFilter'
-import PaperFilter from '@/filters/PaperFilter'
 import { Sine, Bounce, Cubic, Back } from 'gsap'
 import { swing } from './motions/swing'
-import { animate } from './motions/animate'
+import { animate } from './core/animate'
 import { all, run } from '@/core/PromiseUtil'
+import { SpriteDef, loadSprites } from '@/sprites/core/loadSprites'
+import { StyledContainer } from './core/StyledContainer'
 
-import store from '@/store'
-
-const createSprite = async (name: string): Promise<PIXI.Sprite> => {
-  const tx = await loadSvg(`/imgs/tama/${name}.svg`)
-  return new PIXI.Sprite(tx)
-}
-
-export const createTama = async () => {
-  const parts = ['LgFr', 'LgBk', 'HrBk', 'AmBk', 'Hd', 'Bd', 'AmFr', 'HrFr']
-  const tasks = parts.map(name => ({ name, task: createSprite(name) }))
-  await Promise.all(tasks.map(t => t.task))
-  const sprites: { [k in string]: PIXI.Sprite } = {}
-  for (const t of tasks) {
-    sprites[t.name] = await t.task
-    sprites[t.name].name = t.name
+const tamaDefs: SpriteDef[] = [
+  {
+    name: 'HrFr',
+    pos: { x: 1, y: 96 },
+    anchor: { x: 0.9, y: 0.05 }
+  },
+  {
+    name: 'AmFr',
+    pos: { x: 174, y: 261 },
+    anchor: { x: 0.55, y: 0.05 }
+  },
+  {
+    name: 'Bd',
+    pos: { x: 94, y: 215 },
+    anchor: { x: 0.9, y: 0.05 }
+  },
+  {
+    name: 'Hd',
+    pos: { x: 184, y: 2 },
+    anchor: { x: 0.6, y: 0.95 }
+  },
+  {
+    name: 'AmBk',
+    pos: { x: 311, y: 233 },
+    anchor: { x: 0.15, y: 0.1 }
+  },
+  {
+    name: 'HrBk',
+    pos: { x: 326, y: 73 },
+    anchor: { x: 0.15, y: 0.05 }
+  },
+  {
+    name: 'LgFr',
+    pos: { x: 317, y: 495 },
+    anchor: { x: 0.3, y: 0.1 }
+  },
+  {
+    name: 'LgBk',
+    pos: { x: 263, y: 502 },
+    anchor: { x: 0.7, y: 0.1 }
   }
+]
 
-  sprites.HrFr.anchor.x = 0.9
-  sprites.HrFr.anchor.y = 0.05
-  sprites.HrBk.anchor.x = 0.15
-  sprites.HrBk.anchor.y = 0.05
-  sprites.Hd.anchor.x = 0.6
-  sprites.Hd.anchor.y = 0.95
-  sprites.AmFr.anchor.x = 0.55
-  sprites.AmFr.anchor.y = 0.05
-  sprites.AmBk.anchor.x = 0.15
-  sprites.AmBk.anchor.y = 0.1
-  sprites.LgFr.anchor.x = 0.3
-  sprites.LgFr.anchor.y = 0.1
-  sprites.LgBk.anchor.x = 0.7
-  sprites.LgBk.anchor.y = 0.1
-
-  sprites.HrFr.x = 1
-  sprites.HrFr.y = 96
-  sprites.HrBk.x = 326
-  sprites.HrBk.y = 73
-  sprites.Hd.x = 184
-  sprites.Hd.y = 2
-  sprites.Bd.x = 94
-  sprites.Bd.y = 215
-  sprites.AmFr.x = 174
-  sprites.AmFr.y = 261
-  sprites.AmBk.x = 311
-  sprites.AmBk.y = 233
-  sprites.LgFr.x = 317
-  sprites.LgFr.y = 495
-  sprites.LgBk.x = 263
-  sprites.LgBk.y = 502
-
-  Object.values(sprites).forEach(sp => {
-    sp.x += sp.anchor.x * sp.width
-    sp.y += sp.anchor.y * sp.height
-  })
-
-  const cont = new PIXI.Container()
-  cont.addChild(...Object.values(sprites))
-  return cont
-}
-
-export class Tama extends PIXI.Container {
+export class Tama extends StyledContainer {
   private cont?: PIXI.Container
   private jumpCount = 0
   constructor() {
@@ -74,11 +57,8 @@ export class Tama extends PIXI.Container {
   }
 
   async load() {
-    this.cont = await createTama()
+    this.cont = await loadSprites(tamaDefs, 'tama')
     this.addChild(this.cont)
-
-    const stageSetting = store.state.stageSetting
-    this.filters = [new OutlineFilter(stageSetting.scale * 5.0), new PaperFilter()]
     this.cont.interactive = true
     this.cont.pivot.x = this.width / 2
     this.cont.pivot.y = this.height

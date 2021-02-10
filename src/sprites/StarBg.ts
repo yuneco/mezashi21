@@ -1,11 +1,10 @@
 import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
-import OutlineFilter from '@/filters/OutlineFilter'
-import PaperFilter from '@/filters/PaperFilter'
 
 import store from '@/store'
-import { animate } from './motions/animate'
+import { animate } from './core/animate'
 import { sleep } from '@/core/sleep'
+import { StyledContainer } from './core/StyledContainer'
 
 const MINSCALE = 0.1
 const MAXSCALE = 2.0
@@ -28,7 +27,7 @@ class Star extends PIXI.Sprite {
   }
 }
 
-export class StarBg extends PIXI.Container {
+export class StarBg extends StyledContainer {
   private starTexture?: PIXI.Texture
   public readonly area: PIXI.Rectangle
   constructor() {
@@ -64,8 +63,5 @@ export class StarBg extends PIXI.Container {
     for (let index = 0; index < STARCOUNT; index++) {
       this.addStar()
     }
-
-    const stageSetting = store.state.stageSetting
-    this.filters = [new OutlineFilter(stageSetting.scale * 5.0), new PaperFilter()]
   }
 }

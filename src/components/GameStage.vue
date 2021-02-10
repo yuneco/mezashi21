@@ -9,6 +9,7 @@
 import { defineComponent, ref, onMounted, reactive } from 'vue'
 import { PixiApp } from '@/logics/PixiApp'
 import { Tama } from '@/sprites/Tama'
+import { Cat } from '@/sprites/Cat'
 import { Planet } from '@/sprites/Planet'
 import { StarBg } from '@/sprites/StarBg'
 
@@ -19,17 +20,24 @@ const initStage = async (canvas: HTMLCanvasElement) => {
   await starBg.load()
   app.stage.addChild(starBg)
 
+  const planetSp = new Planet(700)
+  await planetSp.load()
+  planetSp.x = 375
+  planetSp.y = 1200
+  app.stage.addChild(planetSp)
+
   const tamaSp = new Tama()
   await tamaSp.load()
   app.stage.addChild(tamaSp)
   tamaSp.x = 375
   tamaSp.y = 1200 - 350
 
-  const planetSp = new Planet(700)
-  await planetSp.load()
-  planetSp.x = 375
-  planetSp.y = 1200
-  app.stage.addChild(planetSp)
+  const catSp = new Cat()
+  await catSp.load()
+  app.stage.addChild(catSp)
+  catSp.x = 375
+  catSp.y = 1200 - 350
+
 }
 
 export default defineComponent({

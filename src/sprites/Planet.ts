@@ -1,14 +1,8 @@
 import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
-import OutlineFilter from '@/filters/OutlineFilter'
-import PaperFilter from '@/filters/PaperFilter'
+import { StyledContainer } from './core/StyledContainer'
 
-// ↓ Wrong! まちがい
-//import { useStore } from 'vuex'
-// ↓ Correct! せいかい
-import store from '@/store'
-
-export class Planet extends PIXI.Container {
+export class Planet extends StyledContainer {
   private sizeVal: number
   private cont?: PIXI.Sprite
   constructor(size = 300) {
@@ -26,11 +20,7 @@ export class Planet extends PIXI.Container {
 
   async load() {
     this.cont = new PIXI.Sprite(await loadSvg('/imgs/Planet1.svg'))
-
     this.addChild(this.cont)
-
-    const stageSetting = store.state.stageSetting
-    this.filters = [new OutlineFilter(stageSetting.scale * 5.0), new PaperFilter()]
     this.pivot.x = this.width / 2
     this.pivot.y = this.height / 2
     this.applySize()
