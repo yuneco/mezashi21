@@ -1,46 +1,48 @@
 <template>
   <div class="GameStageRoot">
+    <div class="debug">{{ debug.width }} * {{ debug.height }}</div>
     <canvas ref="canvas"></canvas>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue'
-import * as PIXI from 'pixi.js'
+import { defineComponent, ref, onMounted, reactive } from 'vue'
 import { PixiApp } from '@/logics/PixiApp'
-import { loadSvg } from '@/logics/loadImgs'
-
-import { TweenMax, Power2 } from 'gsap'
+import { Tama } from '@/sprites/Tama'
+import { Planet } from '@/sprites/Planet'
+import { StarBg } from '@/sprites/StarBg'
 
 const initStage = async (canvas: HTMLCanvasElement) => {
   const app = new PixiApp(canvas)
 
-  const sizes = [50, 80, 120, 200, 300, 500]
-  const tasks = sizes.map(s => loadSvg('/imgs/tama.svg', s))
-  const textures = (await Promise.all(tasks)).sort(
-    (t1, t2) => t1.width - t2.width
-  )
-  const sprites = textures.map(tx => new PIXI.Sprite(tx))
-  sprites.forEach((sp, index) => {
-    sp.anchor.x = 0.5
-    sp.anchor.y = 1
-    sp.x = index > 0 ? sprites[index - 1].x + sprites[index - 1].width + 10 : 50
-    sp.y = 900
-    sp.angle = -20
-    TweenMax.to(sp, {
-      pixi: { angle: 30 },
-      duration: 2,
-      repeat: -1,
-      ease: Power2.easeInOut,
-      yoyo: true
-    })
-  })
-  app.stage.addChild(...sprites)
+  const starBg = new StarBg()
+  await starBg.load()
+  app.stage.addChild(starBg)
+
+  const tamaSp = new Tama()
+  await tamaSp.load()
+  app.stage.addChild(tamaSp)
+  tamaSp.x = 375
+  tamaSp.y = 1200 - 350
+
+  const planetSp = new Planet(700)
+  await planetSp.load()
+  planetSp.x = 375
+  planetSp.y = 1200
+  app.stage.addChild(planetSp)
 }
 
 export default defineComponent({
   name: 'GameStage',
   setup() {
+    const debug = reactive({
+      width: window.innerWidth,
+      height: window.innerHeight
+    })
+    window.addEventListener('resize', () => {
+      debug.width = window.innerWidth
+      debug.height = window.innerHeight
+    })
     const canvas = ref<HTMLCanvasElement>()
     onMounted(() => {
       if (canvas.value) {
@@ -48,6 +50,7 @@ export default defineComponent({
       }
     })
     return {
+      debug,
       canvas
     }
   }
@@ -57,6 +60,15 @@ export default defineComponent({
 <style lang="scss" scoped>
 .GameStageRoot {
   position: relative;
+  display: flex;
   height: 100%;
+  canvas {
+    box-sizing: border-box;
+    border: 1px solid gray;
+    margin: auto;
+  }
+  .debug {
+    position: absolute;
+  }
 }
 </style>

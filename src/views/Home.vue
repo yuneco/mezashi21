@@ -5,20 +5,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import GameStage from "@/components/GameStage.vue"; // @ is an alias to /src
+import { defineComponent } from 'vue'
+import GameStage from '@/components/GameStage.vue' // @ is an alias to /src
 
 export default defineComponent({
-  name: "Home",
+  name: 'Home',
   components: {
     GameStage
   }
-});
+})
 </script>
 
 <style lang="scss" scoped>
 .home {
   position: inherit;
   height: 100%;
-}
-</style>
+}</style
+>Í

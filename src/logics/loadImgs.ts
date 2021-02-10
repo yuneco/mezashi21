@@ -40,22 +40,14 @@ const resizeImgElem = (img: HTMLImageElement, w?: number, h?: number): void => {
   }
 }
 
-export const loadSvg = async (
-  url: string,
-  w?: number,
-  h?: number
-): Promise<PIXI.Texture> => {
+export const loadSvg = async (url: string, w?: number, h?: number): Promise<PIXI.Texture> => {
   const el = new Image(w, h)
   const resolution = window.devicePixelRatio
   const promise = new Promise<PIXI.Texture>((resolve, reject) => {
     el.addEventListener('load', () => {
       if (!w && !h) {
         // サイズ指定がない場合
-        resizeImgElem(
-          el,
-          el.naturalWidth * resolution,
-          el.naturalHeight * resolution
-        )
+        resizeImgElem(el, el.naturalWidth * resolution, el.naturalHeight * resolution)
       } else {
         // w,hの少なくとも一方が指定されている場合
         resizeImgElem(el, w && w * resolution, h && h * resolution)
