@@ -11,31 +11,46 @@ const defineStageSize = () => {
   return { width: BASE_W * ratio, height: BASE_H * ratio, scale: ratio, vw: BASE_W, vh: BASE_H }
 }
 
-export class PixiApp {
-  private readonly app: PIXI.Application
-  private readonly world: PIXI.Container
+const getGlobalAngle = (o: PIXI.DisplayObject): number => {
+  let angle = o.angle
+  let parent = o.parent
+  while (parent) {
+    angle += parent.angle
+    parent = parent.parent
+  }
+  return angle
+}
+
+export class PixiApp extends PIXI.Application {
+  readonly world: PIXI.Container
+  readonly cameraLayer: PIXI.Container
 
   constructor(canvas: HTMLCanvasElement) {
     const size = defineStageSize()
-
-    this.app = new PIXI.Application({
+    super({
       width: size.width,
       height: size.height,
       view: canvas,
       backgroundColor: 0xcccccc,
       resolution: window.devicePixelRatio || 1,
-      antialias: true,
+      antialias: window.devicePixelRatio <= 1,
       autoDensity: true,
       transparent: true
     })
+    PIXI.settings.FILTER_RESOLUTION = window.devicePixelRatio || 1
 
-    const worldRoot = new PIXI.Container()
-    worldRoot.width = size.vw
-    worldRoot.height = size.vh
-    this.world = worldRoot
+    const world = new PIXI.Container()
+    world.width = size.vw
+    world.height = size.vh
+    this.world = world
+    this.stage.addChild(world)
+    world.scale.set(size.scale)
 
-    this.app.stage.addChild(worldRoot)
-    worldRoot.scale.set(size.scale)
+    const cameraLayer = new PIXI.Container()
+    cameraLayer.width = size.vw
+    cameraLayer.height = size.vh
+    this.cameraLayer = cameraLayer
+    this.world.addChild(cameraLayer)
 
     store.commit('setStageSetting', {
       width: size.width,
@@ -46,7 +61,17 @@ export class PixiApp {
     })
   }
 
-  get stage() {
-    return this.world
+  moveCamera(obj: PIXI.DisplayObject) {
+    const gPos = obj.toGlobal(obj.pivot).clone()
+    const stageSetting = store.state.stageSetting
+    gPos.x /= stageSetting.scale
+    gPos.y /= stageSetting.scale
+
+    const gAngle = getGlobalAngle(obj)
+
+    const center = new PIXI.Point(stageSetting.vw * 0.5, stageSetting.vh * 0.85)
+    this.cameraLayer.x -= gPos.x - center.x
+    this.cameraLayer.y -= gPos.y - center.y
+    this.cameraLayer.angle -= gAngle
   }
 }

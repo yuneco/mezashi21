@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js'
-import { Sine, Bounce, Cubic, Back } from 'gsap'
 import { animate } from './core/animate'
 import { all, run } from '@/core/PromiseUtil'
 import { SpriteDef, loadSprites } from '@/sprites/core/loadSprites'
@@ -60,11 +59,13 @@ export class Cat extends StyledContainer {
 
   async load() {
     this.cont = await loadSprites(catDefs, 'cat')
-    this.addChild(this.cont)
+    const scaler = new PIXI.Container()
+    scaler.addChild(this.cont)
+    scaler.scale.set(0.1, 0.1)
+    this.addChild(scaler)
     this.cont.interactive = true
-    this.cont.pivot.x = this.width / 2
-    this.cont.pivot.y = this.height
-    this.scale.set(0.12, 0.12)
+    this.cont.pivot.x = this.cont.width / 2
+    this.cont.pivot.y = this.cont.height
 
     this.swinfTail()
     this.startWalk()
@@ -103,22 +104,32 @@ export class Cat extends StyledContainer {
       return
     }
 
+    const DUR = 1.6
+
+    cont.scale.y = 0.8
     amFr.angle = 20
     lgFr.angle = 20
     amBk.angle = -20
     lgBk.angle = -20
 
+    run(async () => {
+      await animate(cont, { scaleY: 1 }, DUR / 4)
+      await animate(cont, { scaleY: 0.8 }, DUR / 4)
+      await animate(cont, { scaleY: 1 }, DUR / 4)
+      await animate(cont, { scaleY: 0.8 }, DUR / 4)
+    })
+
     await all(
-      animate(amFr, { angle: -20 }, 0.8),
-      animate(lgFr, { angle: -20 }, 0.8),
-      animate(amBk, { angle: 20 }, 0.8),
-      animate(lgBk, { angle: 20 }, 0.8)
+      animate(amFr, { angle: -20 }, DUR / 2),
+      animate(lgFr, { angle: -20 }, DUR / 2),
+      animate(amBk, { angle: 20 }, DUR / 2),
+      animate(lgBk, { angle: 20 }, DUR / 2)
     )
     await all(
-      animate(amFr, { angle: 20 }, 0.8),
-      animate(lgFr, { angle: 20 }, 0.8),
-      animate(amBk, { angle: -20 }, 0.8),
-      animate(lgBk, { angle: -20 }, 0.8)
+      animate(amFr, { angle: 20 }, DUR / 2),
+      animate(lgFr, { angle: 20 }, DUR / 2),
+      animate(amBk, { angle: -20 }, DUR / 2),
+      animate(lgBk, { angle: -20 }, DUR / 2)
     )
   }
 }

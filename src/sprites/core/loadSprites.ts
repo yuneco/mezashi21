@@ -19,8 +19,12 @@ const createSprite = async (name: string): Promise<PIXI.Sprite> => {
   return new PIXI.Sprite(tx)
 }
 
-export const loadSprites = async (defs: SpriteDef[], dir?: string): Promise<PIXI.Container> => {
-  const container = new PIXI.Container()
+export const loadSprites = async (
+  defs: SpriteDef[],
+  dir?: string,
+  parent?: PIXI.Container
+): Promise<PIXI.Container> => {
+  const container = parent ?? new PIXI.Container()
   const tasks = defs.map((def, index) => {
     return async () => {
       const sp = await createSprite((dir ? `${dir}/` : '') + (def.fileName ?? def.name))

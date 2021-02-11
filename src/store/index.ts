@@ -8,6 +8,10 @@ export default createStore({
       vw: 0,
       vh: 0,
       scale: 1
+    },
+    tama: {
+      dir: 'right',
+      motion: 'stay'
     }
   },
   mutations: {
@@ -20,6 +24,9 @@ export default createStore({
       state.stageSetting.scale = payload.scale
       state.stageSetting.vw = payload.vw
       state.stageSetting.vh = payload.vh
+    },
+    setTamaDirection(state, payload: { dir: 'left' | 'right' }) {
+      state.tama.dir = payload.dir
     }
   },
   actions: {},
