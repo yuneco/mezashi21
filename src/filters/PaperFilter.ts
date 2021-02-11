@@ -31,8 +31,6 @@ export default class PastelFilter extends PIXI.Filter {
     output: PIXI.RenderTexture,
     clear: PIXI.CLEAR_MODES
   ): void {
-    const thickness = this.uniforms.uThickness
-    //console.log(input._frame.width, input._frame.height);
     this.uniforms.uSize[0] = input._frame.width
     this.uniforms.uSize[1] = input._frame.height
     filterManager.applyFilter(this, input, output, clear)
