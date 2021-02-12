@@ -47,32 +47,38 @@ const catDefs: SpriteDef[] = [
   }
 ]
 
+let instanseSeq = 0
+
 export class Cat extends StyledContainer {
-  private cont?: PIXI.Container
-  private jumpCount = 0
+  readonly chara = new PIXI.Container()
   private isWalking = false
   private walkPromise?: Promise<void>
+  private _id = instanseSeq++
 
   constructor() {
     super()
   }
 
   async load() {
-    this.cont = await loadSprites(catDefs, 'cat')
+    await loadSprites(catDefs, 'cat', this.chara)
     const scaler = new PIXI.Container()
-    scaler.addChild(this.cont)
+    scaler.addChild(this.chara)
     scaler.scale.set(0.1, 0.1)
     this.addChild(scaler)
-    this.cont.interactive = true
-    this.cont.pivot.x = this.cont.width / 2
-    this.cont.pivot.y = this.cont.height
+    this.chara.interactive = true
+    this.chara.pivot.x = this.chara.width / 2
+    this.chara.pivot.y = this.chara.height
 
     this.swinfTail()
     this.startWalk()
   }
 
+  get id() {
+    return 'cat-' + this._id
+  }
+
   swinfTail() {
-    const tail = this.cont?.getChildByName('Tl') // しっぽ
+    const tail = this.chara?.getChildByName('Tl') // しっぽ
     if (!tail) {
       return
     }
@@ -95,7 +101,7 @@ export class Cat extends StyledContainer {
   }
 
   async step() {
-    const cont = this.cont // 本体
+    const cont = this.chara // 本体
     const amFr = cont?.getChildByName('AmFr') // 腕手前
     const amBk = cont?.getChildByName('AmBk') // 腕奥
     const lgFr = cont?.getChildByName('LgFr') // 足手前

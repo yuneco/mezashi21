@@ -9,6 +9,7 @@ import store from '@/store'
 import { Satellite } from '@/sprites/Satellite'
 import { angleOfPoints } from './coordUtils'
 import { removeFrom } from '@/core/ArrayUtil'
+import { CollisionDetector, CollidableObject } from '@/logics/CollisionDetector'
 
 const setOnPlanet = (planet: Planet, ...charas: PIXI.Container[]) => {
   charas.forEach(chara => {
@@ -33,6 +34,8 @@ export class GameStage {
   readonly cats: Cat[]
   readonly sats: Satellite[]
   readonly mezashis: Mezashi[]
+
+  readonly detector = new CollisionDetector()
 
   constructor(canvas: HTMLCanvasElement) {
     this.app = new PixiApp(canvas)
@@ -72,7 +75,7 @@ export class GameStage {
   private async addMezashi(aimTo: PIXI.Point) {
     const mzs = new Mezashi()
     await mzs.load()
-    
+
     const tamaPos = this.tama.globalTamaPos
     const tamaDir = store.state.tama.dir
     tamaPos.x += tamaDir === 'left' ? -40 : 40
@@ -102,19 +105,57 @@ export class GameStage {
     this.cats.forEach(cat => {
       cat.angle -= 0.07
     })
+
+    this.detectCollision()
   }
 
   private onWorldTap(ev: PIXI.InteractionEvent) {
-    console.log(ev)
     const isBgTap = ev.target === this.app.world
     if (isBgTap) {
       const local = this.app.global2Camera(ev.data.global)
       // めざし発射
       this.addMezashi(local)
       // タップの方向に合わせて向きを変える
-      const size = (ev.data.global.x < store.state.stageSetting.width / 2) ? 'left' : 'right'
-      store.commit('setTamaDirection', {dir: size})
+      const size = ev.data.global.x < store.state.stageSetting.width / 2 ? 'left' : 'right'
+      store.commit('setTamaDirection', { dir: size })
     }
   }
 
+  private detectCollision = () => {
+    const targets: CollidableObject[] = []
+    targets.push({
+      obj: this.tama.chara,
+      id: 'tama',
+      category: 'tama',
+      targets: ['cat'],
+      margin: [0.1, 0]
+    })
+    targets.push(
+      ...this.cats
+        .filter(cat => cat.worldVisible)
+        .map(cat => ({
+          obj: cat.chara,
+          id: cat.id,
+          category: 'cat',
+          targets: ['tama', 'mezashi']
+        }))
+    )
+    targets.push(
+      ...this.mezashis
+        .filter(mzs => mzs.worldVisible)
+        .map(mzs => ({
+          obj: mzs.chara,
+          id: mzs.id,
+          category: 'mezashi',
+          targets: ['cat']
+        }))
+    )
+
+    this.detector.clear()
+    this.detector.add(...targets)
+    const hitPairs = this.detector.detect()
+    if (hitPairs.length) {
+      console.log(hitPairs)
+    }
+  }
 }

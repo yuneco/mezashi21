@@ -8,6 +8,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@types/box-intersect": "^1.0.0",
+    "box-intersect": "^1.0.2",
     "core-js": "^3.6.5",
     "gsap": "^3.6.0",
     "pixi.js": "^5.3.7",
