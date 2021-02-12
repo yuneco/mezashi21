@@ -7,7 +7,7 @@ export const animate = async (
   duration: number,
   ease?: gsap.EaseFunction
 ) => {
-  await gsap.to(o, { pixi: vars, duration, ease: ease ?? Sine.easeOut })
+  return gsap.to(o, { pixi: vars, duration, ease: ease ?? Sine.easeOut })
 }
 
 export const anime = (

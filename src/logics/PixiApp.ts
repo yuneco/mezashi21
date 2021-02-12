@@ -40,6 +40,7 @@ export class PixiApp extends PIXI.Application {
     PIXI.settings.FILTER_RESOLUTION = window.devicePixelRatio || 1
 
     const world = new PIXI.Container()
+    world.name = 'world'
     world.width = size.vw
     world.height = size.vh
     this.world = world
@@ -59,6 +60,9 @@ export class PixiApp extends PIXI.Application {
       vw: size.vw,
       vh: size.vh
     })
+
+    world.interactive = true
+    world.hitArea = new PIXI.Rectangle(0, 0, size.vw, size.vh)
   }
 
   moveCamera(obj: PIXI.DisplayObject) {
@@ -69,9 +73,13 @@ export class PixiApp extends PIXI.Application {
 
     const gAngle = getGlobalAngle(obj)
 
-    const center = new PIXI.Point(stageSetting.vw * 0.5, stageSetting.vh * 0.85)
+    const center = new PIXI.Point(stageSetting.vw * 0.5, stageSetting.vh * 0.75)
     this.cameraLayer.x -= gPos.x - center.x
     this.cameraLayer.y -= gPos.y - center.y
     this.cameraLayer.angle -= gAngle
+  }
+
+  global2Camera(gPos: PIXI.IPoint): PIXI.Point {
+    return this.cameraLayer.toLocal(gPos)
   }
 }
