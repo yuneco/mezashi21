@@ -27,9 +27,14 @@ export class Planet extends StyledContainer {
     this.pivot.y = this.height / 2
     this.applySize()
 
-    this.cont.interactive = true
-    this.cont.on('pointertap', () => {
-      store.dispatch('tamaJump')
+    sprite.interactive = true
+    sprite.on('pointertap', (ev: PIXI.InteractionEvent) => {
+      const pos = sprite.toLocal(ev.data.global)
+      const dist = Math.hypot(sprite.width / 2 - pos.x, sprite.height / 2 - pos.y)
+      if (dist < sprite.width / 2) {
+        ev.stopPropagation()
+        store.dispatch('tamaJump')
+      }
     })
   }
 
