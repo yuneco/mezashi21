@@ -4,17 +4,25 @@ import { StyledContainer } from './core/StyledContainer'
 import PaperFilter from '@/filters/PaperFilter'
 import { rotate } from './motions/rotate'
 
+let instanseSeq = 0
+
 export class Satellite extends PIXI.Container {
+  readonly cont: PIXI.Container
+  private readonly _id = instanseSeq++
   private sizeVal: number
   private orbitSizeVal: number
-  private cont: PIXI.Container
   private orbitG?: PIXI.Graphics
+
   constructor(size = 30, orbit = 300, dur = 8, isClockwise = true) {
     super()
     this.sizeVal = size
     this.orbitSizeVal = orbit
     this.cont = new StyledContainer()
     rotate(this, dur, isClockwise)
+  }
+
+  get id() {
+    return 'satellite-' + this._id
   }
 
   private applySize() {

@@ -51,9 +51,13 @@ const tamaDefs: SpriteDef[] = [
   }
 ]
 
+/** モーションの種類 */
 type TamaMotion = 'step' | 'jump' | 'over' | 'none'
+/** たまさんの状態 */
 type State = {
+  /** モーションの通番。nextMotionで使用されます */
   motionSeq: number
+  /** 現在のモーションの種類 */
   currentMotion: TamaMotion
 }
 
@@ -85,28 +89,29 @@ export class Tama extends StyledContainer {
     this.chara.pivot.x = this.chara.width / 2
     this.chara.pivot.y = this.chara.height
 
-    // 状態監視
+    // ゲーム状態の監視
     watch(
       () => store.state.game.play,
       newVal => {
         if (newVal === 'over') {
-          this.gameOver()
+          this.gameOverMotion()
         }
       }
     )
 
+    // ジャンプ要求数の監視
     watch(
       () => store.state.tama.jumpCount,
       async (newVal, oldVal) => {
         if (oldVal === 0 && newVal === 1) {
-          await this.jump()
+          await this.jumpMotion()
         }
       }
     )
 
-    this.swingHair()
-    // this.stayMotion = swing(this.chara, 2.5, 15, false)
-    this.step()
+    // デフォルトのアニメーションを開始
+    this.swingHair() // 常時ループ実行
+    this.stepMotion() // 他のモーションが始まるまでループ実行
   }
 
   /**
@@ -132,7 +137,7 @@ export class Tama extends StyledContainer {
    */
   private defaultMotion() {
     if (store.state.game.play === 'playing') {
-      this.step()
+      this.stepMotion()
       return
     }
     this.nextMotion('none')
@@ -148,7 +153,7 @@ export class Tama extends StyledContainer {
     swing(hrBk, 2, 30)
   }
 
-  private async step() {
+  private async stepMotion() {
     const cont = this.chara // 本体
     const amFr = cont?.getChildByName('AmFr') // 腕手前
     const amBk = cont?.getChildByName('AmBk') // 腕奥
@@ -195,7 +200,7 @@ export class Tama extends StyledContainer {
     mo.alive && this.defaultMotion()
   }
 
-  async jump() {
+  private async jumpMotion() {
     const cont = this.chara // 本体
     const amFr = cont?.getChildByName('AmFr') // 腕手前
     const amBk = cont?.getChildByName('AmBk') // 腕奥
@@ -256,13 +261,13 @@ export class Tama extends StyledContainer {
     mo.alive && this.defaultMotion()
   }
 
-  async gameOver() {
+  private async gameOverMotion() {
     const chara = this.chara
     const mo = this.nextMotion('over')
 
     await all(
       run(async () => {
-        await mo.animate(chara, { y: -200 }, 0.5, Cubic.easeOut)
+        await mo.animate(chara, { y: chara.y - 200 }, 0.5, Cubic.easeOut)
         await mo.animate(chara, { y: -0 }, 1.0, Bounce.easeOut)
       }),
       mo.animate(chara, { angle: -110 }, 1.5, Bounce.easeOut)

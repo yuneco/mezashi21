@@ -45,8 +45,8 @@ export class GameStage {
     this.tama = new Tama()
     this.cats = [new Cat()]
     this.sats = [
-      new Satellite(30, PLANET_SIZE + 600, 16, true),
-      new Satellite(80, PLANET_SIZE + 900, 22, false)
+      new Satellite(30, PLANET_SIZE + 600, 7, true),
+      new Satellite(80, PLANET_SIZE + 900, 12, false)
     ]
     this.mezashis = []
   }
@@ -134,7 +134,7 @@ export class GameStage {
       obj: this.tama.chara,
       id: 'tama',
       category: 'tama',
-      targets: ['cat'],
+      targets: ['cat', 'sat'],
       margin: [0.15, 0]
     })
     targets.push(
@@ -144,7 +144,7 @@ export class GameStage {
           obj: cat.chara,
           id: cat.id,
           category: 'cat',
-          targets: ['tama', 'mezashi']
+          targets: ['mezashi']
         }))
     )
     targets.push(
@@ -157,6 +157,15 @@ export class GameStage {
           targets: ['cat']
         }))
     )
+    targets.push(
+      ...this.sats
+        .filter(sat => sat.worldVisible)
+        .map(sat => ({
+          obj: sat.cont,
+          id: sat.id,
+          category: 'sat'
+        }))
+    )
 
     this.detector.clear()
     this.detector.add(...targets)
@@ -166,9 +175,15 @@ export class GameStage {
     }
 
     hitPairs.forEach(pair => {
-      const [sub, obj] = pair
+      const sub = pair[0]
+      // たまさんが何かに当たった
       if (sub.id === 'tama') {
         store.dispatch('gameOver')
+      }
+      // 猫がめざしに当たった
+      if (sub.category === 'cat') {
+        const cat = this.cats.find(cat => cat.id === sub.id)
+        // TODO: 猫のアニメーション
       }
     })
   }
