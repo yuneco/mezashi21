@@ -4,12 +4,18 @@ import { all, run } from '@/core/PromiseUtil'
 import { SpriteDef, loadSprites } from '@/sprites/core/loadSprites'
 import { StyledContainer } from './core/StyledContainer'
 import { swing } from './motions/swing'
+import store from '@/store'
 
 const catDefs: SpriteDef[] = [
   {
     name: 'Hd',
     pos: { x: 0, y: 0 },
     anchor: { x: 0.7, y: 0.7 }
+  },
+  {
+    name: 'HdMzs',
+    pos: { x: -79, y: 0 },
+    anchor: { x: 0.6, y: 0.85 }
   },
   {
     name: 'AmFr',
@@ -47,6 +53,8 @@ const catDefs: SpriteDef[] = [
   }
 ]
 
+type Direction = 'left' | 'right'
+type HeadType = 'Hd' | 'HdMzs'
 let instanseSeq = 0
 
 export class Cat extends StyledContainer {
@@ -54,6 +62,8 @@ export class Cat extends StyledContainer {
   private isWalking = false
   private walkPromise?: Promise<void>
   private _id = instanseSeq++
+  private headType: HeadType = 'Hd'
+  private dir: Direction = 'right'
 
   constructor() {
     super()
@@ -65,11 +75,11 @@ export class Cat extends StyledContainer {
     scaler.addChild(this.chara)
     scaler.scale.set(0.1, 0.1)
     this.addChild(scaler)
-    //this.chara.interactive = true
     this.chara.pivot.x = this.chara.width / 2
     this.chara.pivot.y = this.chara.height
 
-    this.swinfTail()
+    this.head = 'Hd'
+    this.swingTail()
     this.startWalk()
   }
 
@@ -77,7 +87,25 @@ export class Cat extends StyledContainer {
     return 'cat-' + this._id
   }
 
-  swinfTail() {
+  get direction () {
+    return this.dir
+  }
+
+  set direction(d: Direction) {
+    this.dir = d
+    this.scale.x = d == 'right' ? 1 : -1
+  }
+
+  private set head(h: HeadType) {
+    this.headType = h
+    this.chara.getChildByName('Hd').visible = h == 'Hd'
+    this.chara.getChildByName('HdMzs').visible = h == 'HdMzs'
+  }
+  private get head() {
+    return this.headType
+  }
+
+  swingTail() {
     const tail = this.chara?.getChildByName('Tl') // しっぽ
     if (!tail) {
       return
@@ -91,7 +119,7 @@ export class Cat extends StyledContainer {
     }
     this.isWalking = true
     while (this.isWalking) {
-      await (this.walkPromise = this.step())
+      await (this.walkPromise = this.stepMotion())
     }
   }
 
@@ -100,12 +128,12 @@ export class Cat extends StyledContainer {
     await this.walkPromise
   }
 
-  async step() {
+  async stepMotion() {
     const cont = this.chara // 本体
-    const amFr = cont?.getChildByName('AmFr') // 腕手前
-    const amBk = cont?.getChildByName('AmBk') // 腕奥
-    const lgFr = cont?.getChildByName('LgFr') // 足手前
-    const lgBk = cont?.getChildByName('LgBk') // 足奥
+    const amFr = cont.getChildByName('AmFr') // 腕手前
+    const amBk = cont.getChildByName('AmBk') // 腕奥
+    const lgFr = cont.getChildByName('LgFr') // 足手前
+    const lgBk = cont.getChildByName('LgBk') // 足奥
     if (!cont || !amFr || !amBk || !lgFr || !lgBk) {
       return
     }
@@ -137,5 +165,20 @@ export class Cat extends StyledContainer {
       animate(amBk, { angle: -20 }, DUR / 2),
       animate(lgBk, { angle: -20 }, DUR / 2)
     )
+  }
+
+  async overMotion(hasMezashi = true) {
+    const chara = this.chara // 本体
+    const gHeight = store.state.stageSetting.height
+    const gPos = chara.toGlobal(chara.pivot)
+    gPos.y = gHeight
+    const localDest = chara.toLocal(gPos)
+    const DUR = 1.5
+    if (hasMezashi) {
+      this.head = 'HdMzs'
+    }
+    this.stopWalk()
+    await animate(chara, { angle: 360 }, DUR * 0.2)
+    await animate(chara, { x: localDest.x, y: localDest.y }, DUR * 0.8)
   }
 }

@@ -39,11 +39,11 @@ export class GameStage {
   constructor(canvas: HTMLCanvasElement) {
     this.app = new PixiApp(canvas)
 
-    const PLANET_SIZE = 700
+    const PLANET_SIZE = 400
     this.starBg = new StarBg()
     this.planet = new Planet(PLANET_SIZE)
     this.tama = new Tama()
-    this.cats = [new Cat()]
+    this.cats = []
     this.sats = [
       new Satellite(30, PLANET_SIZE + 600, 7, true),
       new Satellite(80, PLANET_SIZE + 900, 12, false)
@@ -58,8 +58,7 @@ export class GameStage {
 
     this.planet.x = 375
     this.planet.y = 1200
-    setOnPlanet(this.planet, this.tama, ...this.cats)
-    this.cats[0].angle = 60
+    setOnPlanet(this.planet, this.tama)
     setOnPlanetCenter(this.planet, ...this.sats)
 
     this.app.ticker.add(() => {
@@ -69,6 +68,14 @@ export class GameStage {
     this.app.world.on('pointertap', (ev: PIXI.InteractionEvent) => {
       this.onWorldTap(ev)
     })
+
+    setInterval(() => {
+      const MAX_CATS = 10
+      if (this.cats.length >= MAX_CATS){
+        return
+      }
+      this.addCat()
+    }, 3000)
   }
 
   private async addMezashi(aimTo: PIXI.Point) {
@@ -86,6 +93,22 @@ export class GameStage {
     await mzs.fire(from, angle, 1200)
     this.app.cameraLayer.removeChild(mzs)
     removeFrom(this.mezashis, mzs)
+  }
+
+  private async addCat() {
+    const cat = new Cat()
+    await cat.load()
+    this.cats.push(cat)
+    cat.angle = this.tama.angle + 180
+    cat.direction = Math.random() > 0.5 ? 'right' : 'left'
+    this.app.cameraLayer.addChild(cat)
+    setOnPlanet(this.planet, cat)
+  }
+
+  private async removeCat(cat: Cat) {
+    removeFrom(this.cats, cat)
+    await cat.overMotion()
+    cat.parent.removeChild(cat)
   }
 
   private onTick() {
@@ -106,7 +129,7 @@ export class GameStage {
     }
 
     this.cats.forEach(cat => {
-      cat.angle -= 0.07
+      cat.angle += cat.direction === 'left' ? 0.15 : -0.15
     })
 
     this.detectCollision()
@@ -117,15 +140,12 @@ export class GameStage {
     if (isGameOver) {
       return // ゲームオーバーなら何もできない
     }
-    const isBgTap = ev.target === this.app.world
-    if (isBgTap) {
-      const local = this.app.global2Camera(ev.data.global)
-      // めざし発射
-      this.addMezashi(local)
-      // タップの方向に合わせて向きを変える
-      const size = ev.data.global.x < store.state.stageSetting.width / 2 ? 'left' : 'right'
-      store.commit('setTamaDirection', { dir: size })
-    }
+    const local = this.app.global2Camera(ev.data.global)
+    // めざし発射
+    this.addMezashi(local)
+    // タップの方向に合わせて向きを変える
+    const size = ev.data.global.x < store.state.stageSetting.width / 2 ? 'left' : 'right'
+    store.commit('setTamaDirection', { dir: size })
   }
 
   private detectCollision = () => {
@@ -183,7 +203,16 @@ export class GameStage {
       // 猫がめざしに当たった
       if (sub.category === 'cat') {
         const cat = this.cats.find(cat => cat.id === sub.id)
-        // TODO: 猫のアニメーション
+        if (cat) {
+          this.removeCat(cat)
+        }
+      }
+      // めざしが何かに当たった
+      if (sub.category === 'mezashi') {
+        const mzs = this.mezashis.find(mzs => mzs.id === sub.id)
+        if (mzs) {
+          mzs.visible = false
+        }
       }
     })
   }
