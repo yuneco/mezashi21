@@ -65,7 +65,7 @@ export class Cat extends StyledContainer {
     scaler.addChild(this.chara)
     scaler.scale.set(0.1, 0.1)
     this.addChild(scaler)
-    this.chara.interactive = true
+    //this.chara.interactive = true
     this.chara.pivot.x = this.chara.width / 2
     this.chara.pivot.y = this.chara.height
 

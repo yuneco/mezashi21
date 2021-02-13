@@ -4,7 +4,6 @@ import { Cat } from '@/sprites/Cat'
 import { Planet } from '@/sprites/Planet'
 import { Mezashi } from '@/sprites/Mezashi'
 import { StarBg } from '@/sprites/StarBg'
-//import { animate } from '@/sprites/core/animate'
 import store from '@/store'
 import { Satellite } from '@/sprites/Satellite'
 import { angleOfPoints } from './coordUtils'
@@ -92,16 +91,20 @@ export class GameStage {
   private onTick() {
     this.app.moveCamera(this.tama.chara.parent)
 
-    const tamaDir = store.state.tama.dir
-    const isJumping = this.tama.isJumping
-    if (tamaDir == 'right') {
-      this.tama.angle += isJumping ? 0.3 : 0.1
-      this.tama.scale.x = 1
+    const isGameOver = store.state.game.play === 'over'
+    if (!isGameOver) {
+      const tamaDir = store.state.tama.dir
+      const isJumping = store.state.tama.jumpCount > 0
+      if (tamaDir == 'right') {
+        this.tama.angle += isJumping ? 0.3 : 0.1
+        this.tama.scale.x = 1
+      }
+      if (tamaDir == 'left') {
+        this.tama.angle -= isJumping ? 0.3 : 0.1
+        this.tama.scale.x = -1
+      }
     }
-    if (tamaDir == 'left') {
-      this.tama.angle -= isJumping ? 0.3 : 0.1
-      this.tama.scale.x = -1
-    }
+
     this.cats.forEach(cat => {
       cat.angle -= 0.07
     })
@@ -110,6 +113,10 @@ export class GameStage {
   }
 
   private onWorldTap(ev: PIXI.InteractionEvent) {
+    const isGameOver = store.state.game.play === 'over'
+    if (isGameOver) {
+      return // ゲームオーバーなら何もできない
+    }
     const isBgTap = ev.target === this.app.world
     if (isBgTap) {
       const local = this.app.global2Camera(ev.data.global)
@@ -128,7 +135,7 @@ export class GameStage {
       id: 'tama',
       category: 'tama',
       targets: ['cat'],
-      margin: [0.1, 0]
+      margin: [0.15, 0]
     })
     targets.push(
       ...this.cats
@@ -154,8 +161,15 @@ export class GameStage {
     this.detector.clear()
     this.detector.add(...targets)
     const hitPairs = this.detector.detect()
-    if (hitPairs.length) {
-      console.log(hitPairs)
+    if (!hitPairs.length) {
+      return
     }
+
+    hitPairs.forEach(pair => {
+      const [sub, obj] = pair
+      if (sub.id === 'tama') {
+        store.dispatch('gameOver')
+      }
+    })
   }
 }

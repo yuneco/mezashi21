@@ -1,10 +1,11 @@
 import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
 import { StyledContainer } from './core/StyledContainer'
+import store from '@/store'
 
 export class Planet extends StyledContainer {
   private sizeVal: number
-  private cont?: PIXI.Sprite
+  private cont = new PIXI.Container()
   constructor(size = 300) {
     super()
     this.sizeVal = size
@@ -19,11 +20,17 @@ export class Planet extends StyledContainer {
   }
 
   async load() {
-    this.cont = new PIXI.Sprite(await loadSvg('/imgs/Planet1.svg'))
+    const sprite = new PIXI.Sprite(await loadSvg('/imgs/Planet1.svg'))
+    this.cont.addChild(sprite)
     this.addChild(this.cont)
     this.pivot.x = this.width / 2
     this.pivot.y = this.height / 2
     this.applySize()
+
+    this.cont.interactive = true
+    this.cont.on('pointertap', () => {
+      store.dispatch('tamaJump')
+    })
   }
 
   get size(): number {

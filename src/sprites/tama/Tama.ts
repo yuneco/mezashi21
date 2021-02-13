@@ -1,10 +1,12 @@
 import * as PIXI from 'pixi.js'
-import gsap, { Sine, Bounce, Cubic, Back } from 'gsap'
+import { Sine, Bounce, Cubic, Back } from 'gsap'
 import { swing } from '../motions/swing'
-import { animate } from '../core/animate'
+import { Animator } from '../core/animate'
 import { all, run } from '@/core/PromiseUtil'
 import { SpriteDef, loadSprites } from '@/sprites/core/loadSprites'
 import { StyledContainer } from '../core/StyledContainer'
+import { computed, reactive, watch } from 'vue'
+import store from '@/store'
 
 const tamaDefs: SpriteDef[] = [
   {
@@ -49,20 +51,26 @@ const tamaDefs: SpriteDef[] = [
   }
 ]
 
+type TamaMotion = 'step' | 'jump' | 'over' | 'none'
+type State = {
+  motionSeq: number
+  currentMotion: TamaMotion
+}
+
 // 構造
 // this ... 公開されるContainer。x,y,scale,angleを自由に変更可能 = このクラス内では操作しない
 //   scaler ... 全体のサイズを調整のみを行う
 //     chara ... キャラクターパーツの親。足元にpivot。アクションでx,y,angle,scale等は変わる
 //       各パーツ
 
-type TamaMotion = 'stay' | 'jump' | 'step'
-
 export class Tama extends StyledContainer {
   private scaler = new PIXI.Container()
   readonly chara = new PIXI.Container()
-  private jumpCount = 0
-  // private stayMotion?: gsap.core.Timeline
-  private stepMotion?: gsap.core.Timeline
+
+  private state = reactive<State>({
+    motionSeq: 0,
+    currentMotion: 'none'
+  })
 
   constructor() {
     super()
@@ -77,15 +85,25 @@ export class Tama extends StyledContainer {
     this.chara.pivot.x = this.chara.width / 2
     this.chara.pivot.y = this.chara.height
 
-    console.log(this)
-
-    this.chara.on('pointertap', async () => {
-      this.jumpCount++
-      if (this.jumpCount == 1) {
-        await this.jump()
-        this.jumpCount = 0
+    // 状態監視
+    watch(
+      () => store.state.game.play,
+      newVal => {
+        if (newVal === 'over') {
+          this.gameOver()
+        }
       }
-    })
+    )
+
+    watch(
+      () => store.state.tama.jumpCount,
+      async (newVal, oldVal) => {
+        if (oldVal === 0 && newVal === 1) {
+          await this.jump()
+        }
+      }
+    )
+
     this.swingHair()
     // this.stayMotion = swing(this.chara, 2.5, 15, false)
     this.step()
@@ -98,8 +116,26 @@ export class Tama extends StyledContainer {
     return this.chara.toGlobal(this.chara.pivot)
   }
 
-  get isJumping() {
-    return this.jumpCount > 0
+  /**
+   * 新しいAnimatorインスタンスを生成します。
+   * 生成したAnimatorは次にこのメソッドが呼ばれると自動的にキャンセルされます
+   */
+  private nextMotion(motionName: TamaMotion) {
+    this.state.motionSeq++
+    this.state.currentMotion = motionName
+    const startSeq = this.state.motionSeq
+    return new Animator(computed(() => startSeq !== this.state.motionSeq))
+  }
+
+  /**
+   * 状態に合わせて適切なデフォルトモーションを実行します
+   */
+  private defaultMotion() {
+    if (store.state.game.play === 'playing') {
+      this.step()
+      return
+    }
+    this.nextMotion('none')
   }
 
   private swingHair() {
@@ -122,27 +158,41 @@ export class Tama extends StyledContainer {
       return
     }
 
+    const isReqPreMotion = this.state.currentMotion !== 'step'
     const DUR = 1.5
+    const mo = this.nextMotion('step')
+
+    isReqPreMotion &&
+      (await all(
+        mo.animate(amFr, { angle: 20 }, DUR / 4),
+        mo.animate(amBk, { angle: -20 }, DUR / 4),
+        mo.animate(lgFr, { angle: 20 }, DUR / 4),
+        mo.animate(lgBk, { angle: -20 }, DUR / 4)
+      ))
 
     await all(
-      animate(amFr, { angle: 20 }, DUR / 4),
-      animate(amBk, { angle: -20 }, DUR / 4),
-      animate(lgFr, { angle: 20 }, DUR / 4),
-      animate(lgBk, { angle: -20 }, DUR / 4)
+      mo.animate(amBk, { angle: 40 }, DUR / 2, Sine.easeInOut),
+      mo.animate(lgFr, { angle: -30 }, DUR / 2, Sine.easeOut),
+      mo.animate(amFr, { angle: -20 }, DUR / 2, Sine.easeInOut),
+      mo.animate(lgBk, { angle: 20 }, DUR / 2, Sine.easeOut),
+      run(async () => {
+        await mo.animate(cont, { scaleY: 0.9, y: 0 }, DUR / 4, Sine.easeIn)
+        await mo.animate(cont, { scaleY: 1, y: -45 }, DUR / 4, Sine.easeOut)
+      })
     )
-    const tl = gsap.timeline()
-    tl.to(amFr, { pixi: { angle: -20 }, duration: DUR / 2, ease: Sine.easeInOut }, 0)
-    tl.to(amBk, { pixi: { angle: 40 }, duration: DUR / 2, ease: Sine.easeInOut }, 0)
-    tl.to(lgFr, { pixi: { angle: -30 }, duration: DUR / 2, ease: Sine.easeOut }, 0)
-    tl.to(lgBk, { pixi: { angle: 20 }, duration: DUR / 2, ease: Sine.easeOut }, 0)
 
-    tl.to(cont, { pixi: { scaleY: 0.9, y: 0 }, duration: DUR / 4, ease: Sine.easeIn }, 0)
-    tl.to(cont, { pixi: { scaleY: 1, y: -45 }, duration: DUR / 4, ease: Sine.easeOut }, DUR / 4)
+    await all(
+      mo.animate(amFr, { angle: 20 }, DUR / 2, Sine.easeInOut),
+      mo.animate(amBk, { angle: -20 }, DUR / 2, Sine.easeOut),
+      mo.animate(lgFr, { angle: 20 }, DUR / 2, Sine.easeInOut),
+      mo.animate(lgBk, { angle: -20 }, DUR / 2, Sine.easeOut),
+      run(async () => {
+        await mo.animate(cont, { scaleY: 0.9, y: 0 }, DUR / 4, Sine.easeIn)
+        await mo.animate(cont, { scaleY: 1, y: -45 }, DUR / 4, Sine.easeOut)
+      })
+    )
 
-    tl.yoyo(true)
-    this.stepMotion = tl
-    tl.repeat(-1)
-    tl.play()
+    mo.alive && this.defaultMotion()
   }
 
   async jump() {
@@ -155,57 +205,67 @@ export class Tama extends StyledContainer {
       return
     }
 
-    if (this.stepMotion) {
-      this.stepMotion.pause()
-    }
+    const mo = this.nextMotion('jump')
 
     // 予備動作
     await all(
-      animate(cont, { scaleY: 0.75, angle: 15 }, 0.15, Sine.easeOut),
-      animate(amFr, { angle: -40 }, 0.35),
-      animate(amBk, { angle: -30 }, 0.3),
-      animate(lgBk, { angle: 0 }, 0.3),
-      animate(lgFr, { angle: 0 }, 0.3)
+      mo.animate(cont, { scaleY: 0.75, angle: 15 }, 0.15, Sine.easeOut),
+      mo.animate(amFr, { angle: -40 }, 0.35),
+      mo.animate(amBk, { angle: -30 }, 0.3),
+      mo.animate(lgBk, { angle: 0 }, 0.3),
+      mo.animate(lgFr, { angle: 0 }, 0.3)
     )
     await all(
       // 本体ジャンプ
       run(async () => {
-        await animate(cont, { scaleY: 1.1, y: -1000 }, 1.6, Cubic.easeOut)
+        await mo.animate(cont, { scaleY: 1.1, y: -1000 }, 1.6, Cubic.easeOut)
         // このタイミングまでに2回タップされていたら二段ジャンプ
-        const isDouble = this.jumpCount >= 2
+        const isDouble = store.state.tama.jumpCount >= 2
         if (isDouble) {
-          animate(cont, { scaleY: 0.8 }, 0.5, Back.easeOut)
+          mo.animate(cont, { scaleY: 0.8 }, 0.5, Back.easeOut)
           await all(
-            animate(cont, { y: -1600 }, 0.9, Cubic.easeOut),
-            animate(cont, { angle: -360 }, 1.8, Back.easeOut)
+            mo.animate(cont, { y: -1600 }, 0.9, Cubic.easeOut),
+            mo.animate(cont, { angle: -360 }, 1.8, Back.easeOut)
           )
         }
         if (isDouble) {
-          await animate(cont, { scaleY: 1.0, y: 0 }, 3.5, Bounce.easeOut)
-          cont.angle = 0
+          await mo.animate(cont, { scaleY: 1.0, y: 0 }, 3.5, Bounce.easeOut)
+          mo.set(cont, { angle: 0 })
         } else {
-          await animate(cont, { scaleY: 1.0, y: 0, angle: 0 }, 2.5, Bounce.easeOut)
+          await mo.animate(cont, { scaleY: 1.0, y: 0, angle: 0 }, 2.5, Bounce.easeOut)
         }
       }),
       // 腕振り手前
       run(async () => {
-        await animate(amFr, { angle: 50 }, 1.3)
-        await animate(amFr, { angle: 0 }, 1.0)
+        await mo.animate(amFr, { angle: 50 }, 1.3)
+        await mo.animate(amFr, { angle: 0 }, 1.0)
       }),
       // 腕振り奥
       run(async () => {
-        await animate(amBk, { angle: 30 }, 1.3)
-        await animate(amBk, { angle: 0 }, 1.0)
+        await mo.animate(amBk, { angle: 30 }, 1.3)
+        await mo.animate(amBk, { angle: 0 }, 1.0)
       }),
       // 足振り
       run(async () => {
-        await animate(lgBk, { angle: -30 }, 1.2)
-        await animate(lgBk, { angle: 0 }, 0.9)
+        await mo.animate(lgBk, { angle: -30 }, 1.2)
+        await mo.animate(lgBk, { angle: 0 }, 0.9)
       })
     )
 
-    if (this.stepMotion) {
-      this.stepMotion.play()
-    }
+    store.dispatch('tamaJumpEnd')
+    mo.alive && this.defaultMotion()
+  }
+
+  async gameOver() {
+    const chara = this.chara
+    const mo = this.nextMotion('over')
+
+    await all(
+      run(async () => {
+        await mo.animate(chara, { y: -200 }, 0.5, Cubic.easeOut)
+        await mo.animate(chara, { y: -0 }, 1.0, Bounce.easeOut)
+      }),
+      mo.animate(chara, { angle: -110 }, 1.5, Bounce.easeOut)
+    )
   }
 }

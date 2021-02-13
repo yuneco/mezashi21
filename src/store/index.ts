@@ -1,6 +1,34 @@
 import { createStore } from 'vuex'
 
-export default createStore({
+type Direction = 'left' | 'right'
+type PlayStatus = 'playing' | 'transition' | 'over'
+type TamaJumpCount = 0 | 1 | 2
+
+type StageSetting = {
+  width: number
+  height: number
+  vw: number
+  vh: number
+  scale: number
+}
+
+type TamaState = {
+  dir: Direction
+  jumpCount: TamaJumpCount
+}
+
+type GameState = {
+  play: PlayStatus
+  level: number
+}
+
+type State = {
+  stageSetting: StageSetting
+  tama: TamaState
+  game: GameState
+}
+
+export default createStore<State>({
   state: {
     stageSetting: {
       width: 0,
@@ -11,7 +39,11 @@ export default createStore({
     },
     tama: {
       dir: 'right',
-      motion: 'stay'
+      jumpCount: 0
+    },
+    game: {
+      play: 'playing',
+      level: 1
     }
   },
   mutations: {
@@ -27,8 +59,34 @@ export default createStore({
     },
     setTamaDirection(state, payload: { dir: 'left' | 'right' }) {
       state.tama.dir = payload.dir
+    },
+    setGamePlayStatus(state, payload: { playStatus: PlayStatus }) {
+      state.game.play = payload.playStatus
+    },
+    setTamaJumpCount(state, payload: { jumpCount: TamaJumpCount }) {
+      state.tama.jumpCount = payload.jumpCount
     }
   },
-  actions: {},
+  actions: {
+    gameOver(ctx) {
+      ctx.commit('setGamePlayStatus', { playStatus: 'over' })
+    },
+    newGame(ctx) {
+      ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
+    },
+    tamaJump(ctx) {
+      if (ctx.state.game.play !== 'playing') {
+        return
+      }
+      const MAX_JUMP_COUNT = 2
+      if (ctx.state.tama.jumpCount >= MAX_JUMP_COUNT) {
+        return
+      }
+      ctx.commit('setTamaJumpCount', { jumpCount: ctx.state.tama.jumpCount + 1 })
+    },
+    tamaJumpEnd(ctx) {
+      ctx.commit('setTamaJumpCount', { jumpCount: 0 })
+    }
+  },
   modules: {}
 })
