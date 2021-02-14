@@ -3,12 +3,15 @@ import { loadSvg } from '@/logics/loadImgs'
 import { StyledContainer } from './core/StyledContainer'
 import PaperFilter from '@/filters/PaperFilter'
 import { rotate } from './motions/rotate'
+import { blink } from './motions/blink'
 
 let instanseSeq = 0
 
 export class Satellite extends PIXI.Container {
   readonly cont: PIXI.Container
+  private approachIndicator = new StyledContainer()
   private readonly _id = instanseSeq++
+  private direction: 'clockwise' | 'unticlockwise' = 'clockwise'
   private sizeVal: number
   private orbitSizeVal: number
   private orbitG?: PIXI.Graphics
@@ -17,8 +20,10 @@ export class Satellite extends PIXI.Container {
     super()
     this.sizeVal = size
     this.orbitSizeVal = orbit
+    this.direction = isClockwise ? 'clockwise' : 'unticlockwise'
     this.cont = new StyledContainer()
-    rotate(this, dur, isClockwise)
+    this.IndicatorAngle = undefined
+    rotate(this.cont, dur, isClockwise)
   }
 
   get id() {
@@ -34,6 +39,7 @@ export class Satellite extends PIXI.Container {
   }
 
   private applyOrbit() {
+    // 軌道の円を描く
     if (this.orbitG) {
       this.removeChild(this.orbitG)
     }
@@ -42,14 +48,25 @@ export class Satellite extends PIXI.Container {
     g.drawCircle(0, 0, this.orbitSizeVal / 2)
     g.filters = [new PaperFilter()]
     this.addChildAt(g, 0)
-    this.cont.y = -this.orbitSizeVal / 2
+    // 衛星本体と侵入検知用のマーカーの高さを合わせる
+    const elems = [this.cont, this.approachIndicator]
+    elems.forEach(el => {
+      el.pivot.y = (-this.orbitSizeVal / 2) * (1 / el.scale.y)
+    })
   }
 
   async load() {
     const sp = new PIXI.Sprite(await loadSvg('/imgs/Planet2.svg'))
+    const indicatorSp = new PIXI.Sprite(await loadSvg('/imgs/Warning.svg', 40))
+    blink(indicatorSp, 0.15, Infinity)
+    indicatorSp.angle = 180
+    indicatorSp.y = 50
+    indicatorSp.x = 25
+    this.approachIndicator.addChild(indicatorSp)
+
     sp.anchor.set(0.5, 0.5)
     this.cont.addChild(sp)
-    this.addChild(this.cont)
+    this.addChild(this.cont, this.approachIndicator)
     this.applySize()
     this.applyOrbit()
   }
@@ -61,5 +78,31 @@ export class Satellite extends PIXI.Container {
   set size(v: number) {
     this.sizeVal = v
     this.applySize()
+  }
+
+  get orbitSize() {
+    return this.orbitSizeVal
+  }
+
+  set orbitSize(v: number) {
+    this.orbitSizeVal = v
+    this.applyOrbit()
+  }
+
+  set IndicatorAngle(v: number | undefined) {
+    if (v === undefined) {
+      this.approachIndicator.visible = false
+      return
+    }
+    this.approachIndicator.visible = true
+    this.approachIndicator.angle = v
+  }
+
+  get satelliteAngle() {
+    return this.cont.angle % 360
+  }
+
+  get isClockwise() {
+    return this.direction == 'clockwise'
   }
 }

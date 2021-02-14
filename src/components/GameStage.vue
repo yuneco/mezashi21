@@ -1,7 +1,7 @@
 <template>
   <div class="GameStageRoot">
     <div class="debug">
-      <div class="info">{{ debug.width }} * {{ debug.height }}</div>
+      <div class="info">LEVEL: {{ debug.level }} SCORE: {{ debug.score }}</div>
       <button @click="tamaLeft" :disabled="tamaDir === 'left'">◀︎</button>
       <button @click="tamaRight" :disabled="tamaDir === 'right'">▶︎</button>
     </div>
@@ -13,18 +13,15 @@
 import { defineComponent, ref, onMounted, reactive, computed } from 'vue'
 import { GameStage as GameStageClass } from '@/logics/GameStage'
 import { useStore } from 'vuex'
+import { State as StoreState } from '@/store'
 
 export default defineComponent({
   name: 'GameStage',
   setup() {
-    const store = useStore()
+    const store = useStore<StoreState>()
     const debug = reactive({
-      width: window.innerWidth,
-      height: window.innerHeight
-    })
-    window.addEventListener('resize', () => {
-      debug.width = window.innerWidth
-      debug.height = window.innerHeight
+      level: computed(() => store.state.game.level),
+      score: computed(() => store.state.game.score)
     })
 
     const tamaLeft = () => {

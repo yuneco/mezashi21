@@ -20,9 +20,10 @@ type TamaState = {
 type GameState = {
   play: PlayStatus
   level: number
+  score: number
 }
 
-type State = {
+export type State = {
   stageSetting: StageSetting
   tama: TamaState
   game: GameState
@@ -43,7 +44,8 @@ export default createStore<State>({
     },
     game: {
       play: 'playing',
-      level: 1
+      level: 1,
+      score: 0
     }
   },
   mutations: {
@@ -65,6 +67,9 @@ export default createStore<State>({
     },
     setTamaJumpCount(state, payload: { jumpCount: TamaJumpCount }) {
       state.tama.jumpCount = payload.jumpCount
+    },
+    setGameScore(state, payload: { score: number }) {
+      state.game.score = payload.score
     }
   },
   actions: {
@@ -73,6 +78,7 @@ export default createStore<State>({
     },
     newGame(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
+      ctx.commit('setGameScore', { score: 0 })
     },
     tamaJump(ctx) {
       if (ctx.state.game.play !== 'playing') {
@@ -86,6 +92,9 @@ export default createStore<State>({
     },
     tamaJumpEnd(ctx) {
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
+    },
+    gameIncrementScore(ctx) {
+      ctx.commit('setGameScore', { score: ctx.state.game.score + 1 })
     }
   },
   modules: {}

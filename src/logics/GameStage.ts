@@ -24,6 +24,13 @@ const setOnPlanetCenter = (planet: Planet, ...charas: PIXI.Container[]) => {
   })
 }
 
+const indecatorAngleForOrbit = (orbit: number) => {
+  const width = store.state.stageSetting.vw
+  const rad = Math.acos(width / (orbit + 200))
+  const angle = (rad / Math.PI) * 180
+  return 90 - angle
+}
+
 export class GameStage {
   private readonly app: PixiApp
 
@@ -39,14 +46,14 @@ export class GameStage {
   constructor(canvas: HTMLCanvasElement) {
     this.app = new PixiApp(canvas)
 
-    const PLANET_SIZE = 400
+    const PLANET_SIZE = 600
     this.starBg = new StarBg()
     this.planet = new Planet(PLANET_SIZE)
     this.tama = new Tama()
     this.cats = []
     this.sats = [
       new Satellite(30, PLANET_SIZE + 600, 7, true),
-      new Satellite(80, PLANET_SIZE + 900, 12, false)
+      new Satellite(80, PLANET_SIZE + 1300, 12, false)
     ]
     this.mezashis = []
   }
@@ -71,7 +78,7 @@ export class GameStage {
 
     setInterval(() => {
       const MAX_CATS = 10
-      if (this.cats.length >= MAX_CATS){
+      if (this.cats.length >= MAX_CATS) {
         return
       }
       this.addCat()
@@ -99,8 +106,9 @@ export class GameStage {
     const cat = new Cat()
     await cat.load()
     this.cats.push(cat)
-    cat.angle = this.tama.angle + 180
-    cat.direction = Math.random() > 0.5 ? 'right' : 'left'
+    const isDirRight = Math.random() > 0.5
+    cat.direction = isDirRight ? 'right' : 'left'
+    cat.angle = this.tama.angle + 120 * (isDirRight ? 1 : -1)
     this.app.cameraLayer.addChild(cat)
     setOnPlanet(this.planet, cat)
   }
@@ -132,6 +140,18 @@ export class GameStage {
       cat.angle += cat.direction === 'left' ? 0.15 : -0.15
     })
 
+    this.sats.forEach(sat => {
+      const baseAngle = (this.tama.angle + 180) % 360
+      const angleDiff = sat.satelliteAngle - baseAngle
+      const angleDiffNormalized = angleDiff < 0 ? angleDiff + 360 : angleDiff
+      const approachAngle = sat.isClockwise ? 360 - angleDiffNormalized : angleDiffNormalized
+      const isApproaching = approachAngle > 20 && approachAngle < 90
+      const IndicatorAngle = indecatorAngleForOrbit(sat.orbitSize)
+      sat.IndicatorAngle = isApproaching
+        ? baseAngle + IndicatorAngle * (sat.isClockwise ? -1 : 1)
+        : undefined
+    })
+
     this.detectCollision()
   }
 
@@ -155,7 +175,7 @@ export class GameStage {
       id: 'tama',
       category: 'tama',
       targets: ['cat', 'sat'],
-      margin: [0.15, 0]
+      margin: [0.18, 0.1]
     })
     targets.push(
       ...this.cats
@@ -204,6 +224,7 @@ export class GameStage {
       if (sub.category === 'cat') {
         const cat = this.cats.find(cat => cat.id === sub.id)
         if (cat) {
+          store.dispatch('gameIncrementScore')
           this.removeCat(cat)
         }
       }

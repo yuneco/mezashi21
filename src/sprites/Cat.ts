@@ -87,7 +87,7 @@ export class Cat extends StyledContainer {
     return 'cat-' + this._id
   }
 
-  get direction () {
+  get direction() {
     return this.dir
   }
 
@@ -171,7 +171,7 @@ export class Cat extends StyledContainer {
     const chara = this.chara // 本体
     const gHeight = store.state.stageSetting.height
     const gPos = chara.toGlobal(chara.pivot)
-    gPos.y = gHeight
+    gPos.y = gHeight + 200
     const localDest = chara.toLocal(gPos)
     const DUR = 1.5
     if (hasMezashi) {
@@ -179,6 +179,6 @@ export class Cat extends StyledContainer {
     }
     this.stopWalk()
     await animate(chara, { angle: 360 }, DUR * 0.2)
-    await animate(chara, { x: localDest.x, y: localDest.y }, DUR * 0.8)
+    await animate(chara, { x: localDest.x, y: localDest.y }, DUR * 0.2)
   }
 }
