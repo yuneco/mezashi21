@@ -92,9 +92,12 @@ export class Tama extends StyledContainer {
     // ゲーム状態の監視
     watch(
       () => store.state.game.play,
-      newVal => {
+      (newVal, oldVal) => {
         if (newVal === 'over') {
           this.gameOverMotion()
+        }
+        if (oldVal === 'over') {
+          this.stepMotion()
         }
       }
     )
@@ -169,6 +172,7 @@ export class Tama extends StyledContainer {
 
     isReqPreMotion &&
       (await all(
+        mo.animate(cont, { scaleY: 1, y: 0, angle: 0 }, DUR / 4, Sine.easeIn),
         mo.animate(amFr, { angle: 20 }, DUR / 4),
         mo.animate(amBk, { angle: -20 }, DUR / 4),
         mo.animate(lgFr, { angle: 20 }, DUR / 4),

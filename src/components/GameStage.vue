@@ -1,9 +1,10 @@
 <template>
   <div class="GameStageRoot">
     <div class="debug">
-      <div class="info">LEVEL: {{ debug.level }} SCORE: {{ debug.score }}</div>
-      <button @click="tamaLeft" :disabled="tamaDir === 'left'">◀︎</button>
-      <button @click="tamaRight" :disabled="tamaDir === 'right'">▶︎</button>
+      <div class="info">
+        LEVEL: {{ debug.level }} SCORE: {{ debug.score }}
+        <button @click="newGame">RESTART</button>
+      </div>
     </div>
     <canvas ref="canvas"></canvas>
   </div>
@@ -24,26 +25,27 @@ export default defineComponent({
       score: computed(() => store.state.game.score)
     })
 
-    const tamaLeft = () => {
-      store.commit('setTamaDirection', { dir: 'left' })
-    }
-    const tamaRight = () => {
-      store.commit('setTamaDirection', { dir: 'right' })
-    }
-    const tamaDir = computed(() => store.state.tama.dir)
-
+    let game: GameStageClass | undefined = undefined
     const canvas = ref<HTMLCanvasElement>()
-    onMounted(() => {
-      if (canvas.value) {
-        new GameStageClass(canvas.value).load()
+
+    const newGame = async () => {
+      const canvasEl = canvas.value
+      if (canvasEl) {
+        store.dispatch('newGame')
+        if (game) {
+          game.reset()
+        } else {
+          game = new GameStageClass(canvasEl)
+          await game.load()
+        }
       }
-    })
+    }
+
+    onMounted(newGame)
     return {
       debug,
-      tamaLeft,
-      tamaRight,
-      tamaDir,
-      canvas
+      canvas,
+      newGame
     }
   }
 })

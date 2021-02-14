@@ -1,4 +1,4 @@
-type SatellaiteDef = {
+export type SatelliteDef = {
   /** 衛星の直径 */
   size: number
   /** 軌道の直径 */
@@ -13,7 +13,7 @@ export type LevelDef = {
   /** 惑星のサイズ */
   planetSize: number
   /** 衛星の定義 */
-  satellaites: SatellaiteDef[]
+  satellaites: SatelliteDef[]
   /** このレベルをクリアするために必要なスコア */
   scoreToClear: number
   /** 猫の最大速度(deg/tick) */

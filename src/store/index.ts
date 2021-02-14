@@ -18,6 +18,7 @@ type TamaState = {
 }
 
 type GameState = {
+  seq: number
   play: PlayStatus
   level: number
   score: number
@@ -43,6 +44,7 @@ export default createStore<State>({
       jumpCount: 0
     },
     game: {
+      seq: 0,
       play: 'playing',
       level: 1,
       score: 0
@@ -70,6 +72,12 @@ export default createStore<State>({
     },
     setGameScore(state, payload: { score: number }) {
       state.game.score = payload.score
+    },
+    setGameLevel(state, payload: { level: number }) {
+      state.game.level = payload.level
+    },
+    setGameSeq(state, payload: { seq: number }) {
+      state.game.seq = payload.seq
     }
   },
   actions: {
@@ -77,8 +85,12 @@ export default createStore<State>({
       ctx.commit('setGamePlayStatus', { playStatus: 'over' })
     },
     newGame(ctx) {
+      ctx.commit('setGameSeq', { seq: ctx.state.game.seq + 1 })
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
       ctx.commit('setGameScore', { score: 0 })
+      ctx.commit('setGameLevel', { level: 1 })
+      ctx.commit('setTamaJumpCount', { jumpCount: 0 })
+      ctx.commit('setTamaDirection', { dir: 'right' })
     },
     tamaJump(ctx) {
       if (ctx.state.game.play !== 'playing') {

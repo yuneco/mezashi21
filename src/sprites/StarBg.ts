@@ -30,13 +30,15 @@ class Star extends PIXI.Sprite {
 export class StarBg extends StyledContainer {
   private starTexture?: PIXI.Texture
   public readonly area: PIXI.Rectangle
+  private isDisposed = false
+
   constructor() {
     super()
     this.area = new PIXI.Rectangle(0, 0, store.state.stageSetting.vw, store.state.stageSetting.vh)
   }
 
   private async addStar() {
-    if (!this.starTexture) {
+    if (!this.starTexture || this.isDisposed) {
       return
     }
     await sleep(Math.random() * MAXINTERVAL) // ランダム時間待つ
@@ -58,10 +60,18 @@ export class StarBg extends StyledContainer {
     }
   }
 
+  /**
+   * リソースをロードしてアニメーションを開始します。
+   * <b>不要になったら必ずdispose()を呼び出してください</b>
+   */
   async load() {
     this.starTexture = await loadSvg('/imgs/Star.svg')
     for (let index = 0; index < STARCOUNT; index++) {
       this.addStar()
     }
+  }
+
+  dispose() {
+    this.isDisposed = true
   }
 }

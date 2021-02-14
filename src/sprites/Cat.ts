@@ -65,6 +65,8 @@ export class Cat extends StyledContainer {
   private headType: HeadType = 'Hd'
   private dir: Direction = 'right'
 
+  speed = 0.15
+
   constructor() {
     super()
   }
