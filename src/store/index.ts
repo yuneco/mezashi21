@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 
 type Direction = 'left' | 'right'
 type PlayStatus = 'playing' | 'transition' | 'over'
-type TamaJumpCount = 0 | 1 | 2
+type TamaJumpCount = 0 | 1 | 2 | 3
 
 type StageSetting = {
   width: number
@@ -96,7 +96,7 @@ export default createStore<State>({
       if (ctx.state.game.play !== 'playing') {
         return
       }
-      const MAX_JUMP_COUNT = 2
+      const MAX_JUMP_COUNT = 3
       if (ctx.state.tama.jumpCount >= MAX_JUMP_COUNT) {
         return
       }

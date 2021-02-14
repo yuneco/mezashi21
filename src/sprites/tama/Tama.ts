@@ -52,7 +52,7 @@ const tamaDefs: SpriteDef[] = [
 ]
 
 /** モーションの種類 */
-type TamaMotion = 'step' | 'jump' | 'over' | 'none'
+type TamaMotion = 'step' | 'jump' | 'down' | 'over' | 'none'
 /** たまさんの状態 */
 type State = {
   /** モーションの通番。nextMotionで使用されます */
@@ -108,6 +108,9 @@ export class Tama extends StyledContainer {
       async (newVal, oldVal) => {
         if (oldVal === 0 && newVal === 1) {
           await this.jumpMotion()
+        }
+        if (oldVal === 2 && newVal === 3) {
+          await this.downMotion()
         }
       }
     )
@@ -261,7 +264,40 @@ export class Tama extends StyledContainer {
       })
     )
 
-    store.dispatch('tamaJumpEnd')
+    mo.alive && store.dispatch('tamaJumpEnd')
+    mo.alive && this.defaultMotion()
+  }
+
+  private async downMotion() {
+    const cont = this.chara // 本体
+    const amFr = cont?.getChildByName('AmFr') // 腕手前
+    const amBk = cont?.getChildByName('AmBk') // 腕奥
+    const lgFr = cont?.getChildByName('LgFr') // 足手前
+    const lgBk = cont?.getChildByName('LgBk') // 足奥
+    if (!amFr || !amBk || !lgBk || !lgFr) {
+      return
+    }
+
+    const mo = this.nextMotion('down')
+
+    // 開始時の高さに合わせて所要時間を変える
+    const BASE_DUR = 1.5
+    const BASE_Y = 1000
+    const DUR = (-this.chara.y / BASE_Y) * BASE_DUR
+
+    // 予備動作
+    await all(
+      run(async () => {
+        await mo.animate(cont, { y: 0, scaleY: 0.6, angle: 45 }, DUR * 0.2, Sine.easeOut)
+        await mo.animate(cont, { scaleY: 1, angle: 0 }, DUR * 0.8, Sine.easeInOut)
+      }),
+      mo.animate(amFr, { angle: 0 }, DUR),
+      mo.animate(amBk, { angle: 0 }, DUR),
+      mo.animate(lgBk, { angle: 0 }, DUR),
+      mo.animate(lgFr, { angle: 0 }, DUR)
+    )
+
+    mo.alive && store.dispatch('tamaJumpEnd')
     mo.alive && this.defaultMotion()
   }
 
