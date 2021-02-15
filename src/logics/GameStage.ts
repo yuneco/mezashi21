@@ -18,6 +18,8 @@ import {
 import { AutoCatMaker } from './stageLogics/AutoCatMaker'
 import { changePlanet } from './stageLogics/planetLogics'
 import { addSatellite, clearSatellites } from './stageLogics/satelliteLogics'
+import { levels } from '@/assets/GameLevelDef'
+import { watch } from 'vue'
 
 export class GameStage {
   readonly app: PixiApp
@@ -34,8 +36,9 @@ export class GameStage {
   constructor(canvas: HTMLCanvasElement) {
     this.app = new PixiApp(canvas)
 
+    // 初期要素を配置して初期化
     this.starBg = new StarBg()
-    this.planet = new Planet(100)
+    this.planet = new Planet(100) // ダミー
     this.tama = new Tama()
     this.catMaker = new AutoCatMaker(() => {
       if (this.cats.length < 10) {
@@ -43,6 +46,20 @@ export class GameStage {
         addCat(this, speed)
       }
     })
+
+    // ゲーム状態の変更監視
+    watch(
+      () => store.state.game.scoreInLevel,
+      async newScore => {
+        const level = levels[store.state.game.level] ?? levels[0]
+        if (newScore >= level.scoreToClear) {
+          // レベルアップ
+          console.log('LEVEL UP: ' + (store.state.game.level + 1))
+          store.dispatch('gameLevelUp')
+          this.reset()
+        }
+      }
+    )
   }
 
   async reset() {
@@ -51,22 +68,23 @@ export class GameStage {
     clearSatellites(this)
     clearMezashis(this)
 
+    const levelNo = store.state.game.level
+    const level = levels[levelNo] || levels[0]
+    console.log('NEW LEVEL:' + levelNo, level)
+
     // 仮データセット
     // TODO: レベル定義と現在のレベルから生成する
-    const PLANET_SIZE = 600
-    await changePlanet(this, PLANET_SIZE)
-    await addSatellite(this, {
-      size: 80,
-      orbitSize: PLANET_SIZE + 1300,
-      orbitDuration: 12,
-      initialAngle: 0
-    })
-    await addSatellite(this, {
-      size: 40,
-      orbitSize: PLANET_SIZE + 700,
-      orbitDuration: -7,
-      initialAngle: 0
-    })
+    await changePlanet(this, level.planetSize)
+    await Promise.all(
+      level.satellaites.map(satDef =>
+        addSatellite(this, {
+          size: satDef.size,
+          orbitSize: level.planetSize + satDef.orbitSize,
+          orbitDuration: satDef.orbitDuration,
+          initialAngle: 0
+        })
+      )
+    )
     // たまさんの表示順を一番上にするためaddしなおす
     this.tama.parent.addChild(this.tama)
 
@@ -74,6 +92,7 @@ export class GameStage {
     this.app.moveCamera(this.tama.chara.parent)
 
     // 猫生成機を（再）始動
+    this.catMaker.interval = level.catBornInterval
     this.catMaker.start()
   }
 

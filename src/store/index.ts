@@ -22,6 +22,7 @@ type GameState = {
   play: PlayStatus
   level: number
   score: number
+  scoreInLevel: number
 }
 
 export type State = {
@@ -46,8 +47,9 @@ export default createStore<State>({
     game: {
       seq: 0,
       play: 'playing',
-      level: 1,
-      score: 0
+      level: 0,
+      score: 0,
+      scoreInLevel: 0
     }
   },
   mutations: {
@@ -70,11 +72,13 @@ export default createStore<State>({
     setTamaJumpCount(state, payload: { jumpCount: TamaJumpCount }) {
       state.tama.jumpCount = payload.jumpCount
     },
-    setGameScore(state, payload: { score: number }) {
+    setGameScore(state, payload: { score: number; scoreInLevel: number }) {
       state.game.score = payload.score
+      state.game.scoreInLevel = payload.scoreInLevel
     },
     setGameLevel(state, payload: { level: number }) {
       state.game.level = payload.level
+      state.game.scoreInLevel = 0
     },
     setGameSeq(state, payload: { seq: number }) {
       state.game.seq = payload.seq
@@ -87,10 +91,13 @@ export default createStore<State>({
     newGame(ctx) {
       ctx.commit('setGameSeq', { seq: ctx.state.game.seq + 1 })
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
-      ctx.commit('setGameScore', { score: 0 })
-      ctx.commit('setGameLevel', { level: 1 })
+      ctx.commit('setGameLevel', { level: 0 })
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
       ctx.commit('setTamaDirection', { dir: 'right' })
+      ctx.commit('setGameScore', {
+        score: 0,
+        scoreInLevel: 0
+      })
     },
     tamaJump(ctx) {
       if (ctx.state.game.play !== 'playing') {
@@ -106,7 +113,13 @@ export default createStore<State>({
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
     },
     gameIncrementScore(ctx) {
-      ctx.commit('setGameScore', { score: ctx.state.game.score + 1 })
+      ctx.commit('setGameScore', {
+        score: ctx.state.game.score + 1,
+        scoreInLevel: ctx.state.game.scoreInLevel + 1
+      })
+    },
+    gameLevelUp(ctx) {
+      ctx.commit('setGameLevel', { level: ctx.state.game.level + 1 })
     }
   },
   modules: {}

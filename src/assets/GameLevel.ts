@@ -1,25 +1,25 @@
-export type SatelliteDef = {
+export type SatelliteSetting = {
   /** 衛星の直径 */
-  size: number
+  readonly size: number
   /** 軌道の直径 */
-  orbitSize: number
+  readonly orbitSize: number
   /** 公転周期(sec)。負値にすると逆回転 */
-  orbitDuration: number
+  readonly orbitDuration: number
   /** 開始時の角度 */
-  initialAngle: number
+  readonly initialAngle: number
 }
 
-export type LevelDef = {
+export type GameLevel = {
   /** 惑星のサイズ */
-  planetSize: number
+  readonly planetSize: number
   /** 衛星の定義 */
-  satellaites: SatelliteDef[]
+  readonly satellaites: SatelliteSetting[]
   /** このレベルをクリアするために必要なスコア */
-  scoreToClear: number
+  readonly scoreToClear: number
   /** 猫の最大速度(deg/tick) */
-  maxCatSpeed: number
+  readonly maxCatSpeed: number
   /** 猫の最大ジャンプ高さ(px)。0=ジャンプなし */
-  maxCatJump: number
+  readonly maxCatJump: number
   /** 猫の生成間隔(sec) */
-  catBornInterval: number
+  readonly catBornInterval: number
 }
