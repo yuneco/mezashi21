@@ -54,10 +54,12 @@ const catDefs: SpriteDef[] = [
   }
 ]
 
-type Direction = 'left' | 'right'
-type HeadType = 'Hd' | 'HdMzs'
 let instanseSeq = 0
 
+type Direction = 'left' | 'right'
+type HeadType = 'Hd' | 'HdMzs'
+
+/** 猫の状態 */
 export class Cat extends StyledContainer {
   readonly chara = new PIXI.Container()
   private isWalking = false
@@ -67,6 +69,7 @@ export class Cat extends StyledContainer {
   private dir: Direction = 'right'
 
   speed = 0.15
+  jumpHeight = 0
 
   constructor() {
     super()
@@ -155,6 +158,13 @@ export class Cat extends StyledContainer {
       await animate(cont, { scaleY: 1 }, DUR / 4)
       await animate(cont, { scaleY: 0.8 }, DUR / 4)
     })
+
+    if (this.jumpHeight) {
+      run(async () => {
+        await animate(cont, { y: -1000 }, DUR / 2)
+        await animate(cont, { y: 0 }, DUR / 2)
+      })
+    }
 
     await all(
       animate(amFr, { angle: -20 }, DUR / 2),

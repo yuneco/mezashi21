@@ -4,7 +4,7 @@ export const levels: GameLevel[] = [
   {
     planetSize: 500,
     scoreToClear: 5,
-    maxCatSpeed: 0.3,
+    maxCatSpeed: 0.2,
     maxCatJump: 0,
     catBornInterval: 3,
     satellaites: [
@@ -19,8 +19,8 @@ export const levels: GameLevel[] = [
   {
     planetSize: 800,
     scoreToClear: 5,
-    maxCatSpeed: 0.3,
-    maxCatJump: 0,
+    maxCatSpeed: 0.4,
+    maxCatJump: 500,
     catBornInterval: 3,
     satellaites: [
       {
@@ -40,8 +40,8 @@ export const levels: GameLevel[] = [
   {
     planetSize: 1000,
     scoreToClear: 5,
-    maxCatSpeed: 0.3,
-    maxCatJump: 0,
+    maxCatSpeed: 0.6,
+    maxCatJump: 2000,
     catBornInterval: 3,
     satellaites: [
       {

@@ -43,8 +43,7 @@ export class GameStage {
     this.tama = new Tama()
     this.catMaker = new AutoCatMaker(() => {
       if (this.cats.length < 10) {
-        const speed = 0.1 + Math.random() * 0.3
-        addCat(this, speed)
+        addCat(this)
       }
     })
 
@@ -82,7 +81,15 @@ export class GameStage {
     const levelNo = store.state.game.level
     const level = levels[levelNo] || levels[0]
 
+    // レベル開始時の位置を常に同じにするため、たまさんの角度（=惑星上の位置）をゼロリセット
+    this.tama.angle = 0
+    if (this.app.cameraFocusObject) {
+      // カメラ位置も再設定
+      this.app.moveCamera()
+    }
+
     await changePlanet(this, level.planetSize)
+
     if (isLevelupTransition) {
       await gsap.to(this.app, { cameraY: 0.75, cameraZoom: 1, duration: 1 })
       store.dispatch('gameLevelTransitionEnd')
@@ -101,7 +108,6 @@ export class GameStage {
 
     // たまさんの表示順を一番上にするためaddしなおす
     this.tama.parent.addChild(this.tama)
-    this.tama.angle = 0
     this.app.cameraFocusObject = this.tama.chara.parent
 
     // カメラ位置をセット
