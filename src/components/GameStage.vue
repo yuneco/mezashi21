@@ -2,8 +2,9 @@
   <div class="GameStageRoot">
     <div class="debug">
       <div class="info">
-        LEVEL: {{ debug.level }} SCORE: {{ debug.score }} <button @click="newGame">RESTART</button
-        ><br />
+        LEVEL: {{ debug.level }} SCORE: {{ debug.score }} <button @click="newGame">RESTART</button>
+        <span class="ballets">{{ balletCountStr }}</span>
+        <br />
         <button @click="prevLevel">◀︎ Prev Lv</button>
         <button @click="nextLevel">Next Lv ▶︎</button>
       </div>
@@ -50,13 +51,24 @@ export default defineComponent({
       store.dispatch('gameLevelChange', { level: store.state.game.level + 1 })
     }
 
+    const balletCountStr = computed(() => {
+      const count = store.state.game.balletCount
+      return count
+        ? Array(6)
+            .fill('')
+            .map((_, index) => (index < count ? '●' : '○'))
+            .join('')
+        : 'RELOADING...'
+    })
+
     onMounted(newGame)
     return {
       debug,
       canvas,
       newGame,
       prevLevel,
-      nextLevel
+      nextLevel,
+      balletCountStr
     }
   }
 })

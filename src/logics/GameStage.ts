@@ -21,6 +21,7 @@ import { addSatellite, clearSatellites } from './stageLogics/satelliteLogics'
 import { levels } from '@/assets/GameLevelDef'
 import { watch } from 'vue'
 import gsap, { Cubic } from 'gsap'
+import { sleep } from '@/core/sleep'
 
 export class GameStage {
   readonly app: PixiApp
@@ -60,10 +61,24 @@ export class GameStage {
       }
     )
 
+    // レベル変更の監視
     watch(
       () => store.state.game.level,
       async () => {
         this.reset()
+      }
+    )
+
+    // 弾切れの監視とリロード
+    watch(
+      () => store.state.game.balletCount,
+      async newVal => {
+        if (newVal !== 0) {
+          return
+        }
+        const TIME_TO_RELOAD = 1500
+        await sleep(TIME_TO_RELOAD) // 所定時間待ってから
+        store.dispatch('gameReloadBallet') // リロード
       }
     )
   }
@@ -143,7 +158,11 @@ export class GameStage {
     }
     const local = this.app.global2Camera(ev.data.global)
     // めざし発射
-    addMezashi(this, local)
+    const isFireable = store.state.game.balletCount > 0
+    if (isFireable) {
+      store.dispatch('gameFireBallet')
+      addMezashi(this, local)
+    }
     // タップの方向に合わせてたまさんの向きを変える
     const size = ev.data.global.x < store.state.stageSetting.width / 2 ? 'left' : 'right'
     store.commit('setTamaDirection', { dir: size })

@@ -3,6 +3,7 @@ import { createStore } from 'vuex'
 type Direction = 'left' | 'right'
 type PlayStatus = 'playing' | 'transition' | 'over'
 type TamaJumpCount = 0 | 1 | 2 | 3
+type BalletCount = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 type StageSetting = {
   width: number
@@ -23,6 +24,8 @@ type GameState = {
   level: number
   score: number
   scoreInLevel: number
+  balletCount: BalletCount
+  isReloading: boolean
 }
 
 export type State = {
@@ -49,7 +52,9 @@ export default createStore<State>({
       play: 'playing',
       level: 0,
       score: 0,
-      scoreInLevel: 0
+      scoreInLevel: 0,
+      balletCount: 6,
+      isReloading: false
     }
   },
   mutations: {
@@ -83,6 +88,10 @@ export default createStore<State>({
     },
     setGameSeq(state, payload: { seq: number }) {
       state.game.seq = payload.seq
+    },
+    setBallet(state, payload: { balletCount: BalletCount }) {
+      state.game.balletCount = payload.balletCount
+      state.game.isReloading = payload.balletCount === 0
     }
   },
   actions: {
@@ -99,6 +108,7 @@ export default createStore<State>({
         score: 0,
         scoreInLevel: 0
       })
+      ctx.commit('setBallet', { balletCount: 6 })
     },
     tamaJump(ctx) {
       if (ctx.state.game.play !== 'playing') {
@@ -129,6 +139,12 @@ export default createStore<State>({
     },
     gameLevelTransitionEnd(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
+    },
+    gameFireBallet(ctx) {
+      ctx.commit('setBallet', { balletCount: ctx.state.game.balletCount - 1 })
+    },
+    gameReloadBallet(ctx) {
+      ctx.commit('setBallet', { balletCount: 6 })
     }
   },
   modules: {}
