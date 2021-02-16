@@ -24,6 +24,10 @@ const getGlobalAngle = (o: PIXI.DisplayObject): number => {
 export class PixiApp extends PIXI.Application {
   readonly world: PIXI.Container
   readonly cameraLayer: PIXI.Container
+  readonly bgLayer: PIXI.Container
+  private _cameraFocusObject?: PIXI.DisplayObject
+  cameraY: number
+  cameraZoom: number
 
   constructor(canvas: HTMLCanvasElement) {
     const size = defineStageSize()
@@ -47,11 +51,17 @@ export class PixiApp extends PIXI.Application {
     this.stage.addChild(world)
     world.scale.set(size.scale)
 
+    const bgLayer = new PIXI.Container()
+    this.world.addChild(bgLayer)
+    this.bgLayer = bgLayer
+
     const cameraLayer = new PIXI.Container()
     cameraLayer.width = size.vw
     cameraLayer.height = size.vh
     this.cameraLayer = cameraLayer
     this.world.addChild(cameraLayer)
+    this.cameraY = 0.75
+    this.cameraZoom = 1.0
 
     store.commit('setStageSetting', {
       width: size.width,
@@ -65,21 +75,36 @@ export class PixiApp extends PIXI.Application {
     world.hitArea = new PIXI.Rectangle(0, 0, size.vw, size.vh)
   }
 
-  moveCamera(obj: PIXI.DisplayObject) {
-    const gPos = obj.toGlobal(obj.pivot).clone()
+  moveCamera(obj?: PIXI.DisplayObject) {
+    const target = obj ?? this._cameraFocusObject
+    if (!target) {
+      console.warn('No camera target')
+      return
+    }
+    const gPos = target.toGlobal(target.pivot).clone()
     const stageSetting = store.state.stageSetting
     gPos.x /= stageSetting.scale
     gPos.y /= stageSetting.scale
 
-    const gAngle = getGlobalAngle(obj)
+    const gAngle = getGlobalAngle(target)
 
-    const center = new PIXI.Point(stageSetting.vw * 0.5, stageSetting.vh * 0.75)
+    const center = new PIXI.Point(stageSetting.vw * 0.5, stageSetting.vh * this.cameraY)
     this.cameraLayer.x -= gPos.x - center.x
     this.cameraLayer.y -= gPos.y - center.y
     this.cameraLayer.angle -= gAngle
+    this.cameraLayer.scale.set(this.cameraZoom, this.cameraZoom)
   }
 
   global2Camera(gPos: PIXI.IPoint): PIXI.Point {
     return this.cameraLayer.toLocal(gPos)
+  }
+
+  get cameraFocusObject() {
+    return this._cameraFocusObject
+  }
+
+  set cameraFocusObject(v) {
+    this._cameraFocusObject = v
+    this.moveCamera()
   }
 }

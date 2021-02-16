@@ -20,6 +20,7 @@ import { changePlanet } from './stageLogics/planetLogics'
 import { addSatellite, clearSatellites } from './stageLogics/satelliteLogics'
 import { levels } from '@/assets/GameLevelDef'
 import { watch } from 'vue'
+import gsap, { Cubic } from 'gsap'
 
 export class GameStage {
   readonly app: PixiApp
@@ -56,25 +57,37 @@ export class GameStage {
           // レベルアップ
           console.log('LEVEL UP: ' + (store.state.game.level + 1))
           store.dispatch('gameLevelUp')
-          this.reset()
         }
+      }
+    )
+
+    watch(
+      () => store.state.game.level,
+      async () => {
+        this.reset()
       }
     )
   }
 
   async reset() {
-    this.tama.angle = 0
     clearCats(this)
     clearSatellites(this)
     clearMezashis(this)
 
+    const isLevelupTransition = store.state.game.play === 'transition'
+    if (isLevelupTransition) {
+      await gsap.to(this.app, { cameraY: 1.1, cameraZoom: 2.5, duration: 2.5, ease: Cubic.easeOut })
+    }
+
     const levelNo = store.state.game.level
     const level = levels[levelNo] || levels[0]
-    console.log('NEW LEVEL:' + levelNo, level)
 
-    // 仮データセット
-    // TODO: レベル定義と現在のレベルから生成する
     await changePlanet(this, level.planetSize)
+    if (isLevelupTransition) {
+      await gsap.to(this.app, { cameraY: 0.75, cameraZoom: 1, duration: 1 })
+      store.dispatch('gameLevelTransitionEnd')
+    }
+
     await Promise.all(
       level.satellaites.map(satDef =>
         addSatellite(this, {
@@ -85,8 +98,11 @@ export class GameStage {
         })
       )
     )
+
     // たまさんの表示順を一番上にするためaddしなおす
     this.tama.parent.addChild(this.tama)
+    this.tama.angle = 0
+    this.app.cameraFocusObject = this.tama.chara.parent
 
     // カメラ位置をセット
     this.app.moveCamera(this.tama.chara.parent)
@@ -100,7 +116,8 @@ export class GameStage {
     this.app.cameraLayer.visible = false
     const sprites = [this.starBg, this.tama]
     await Promise.all(sprites.map(sp => sp.load()))
-    sprites.map(sp => this.app.cameraLayer.addChild(sp))
+    this.app.bgLayer.addChild(this.starBg)
+    this.app.cameraLayer.addChild(this.tama)
     await this.reset()
     this.app.cameraLayer.visible = true
 
@@ -127,12 +144,15 @@ export class GameStage {
   }
 
   private onTick() {
-    this.app.moveCamera(this.tama.chara.parent)
+    this.app.moveCamera()
     updateTamaPos(this.tama)
     this.cats.forEach(updateCatPos)
     this.sats.forEach(sat => {
       updateSatIndicator(sat, this.tama.angle)
     })
-    detectCollision(this)
+    const isPlaying = store.state.game.play === 'playing'
+    if (isPlaying) {
+      detectCollision(this)
+    }
   }
 }

@@ -5,6 +5,7 @@ import { SpriteDef, loadSprites } from '@/sprites/core/loadSprites'
 import { StyledContainer } from './core/StyledContainer'
 import { swing } from './motions/swing'
 import store from '@/store'
+import { Cubic } from 'gsap'
 
 const catDefs: SpriteDef[] = [
   {
@@ -172,15 +173,15 @@ export class Cat extends StyledContainer {
   async overMotion(hasMezashi = true) {
     const chara = this.chara // 本体
     const gHeight = store.state.stageSetting.height
-    const gPos = chara.toGlobal(chara.pivot)
-    gPos.y = gHeight + 200
-    const localDest = chara.toLocal(gPos)
+    const gPosDest = chara.toGlobal(chara.pivot)
+    gPosDest.y = gHeight + 200
+    const localDest = chara.toLocal(gPosDest)
     const DUR = 1.5
     if (hasMezashi) {
       this.head = 'HdMzs'
     }
     this.stopWalk()
-    await animate(chara, { angle: 360 }, DUR * 0.2)
-    await animate(chara, { x: localDest.x, y: localDest.y }, DUR * 0.2)
+    await animate(chara, { angle: 360 }, DUR * 0.3, Cubic.easeOut)
+    await animate(chara, { angle: 480, x: localDest.x, y: localDest.y }, DUR * 0.5, Cubic.easeIn)
   }
 }

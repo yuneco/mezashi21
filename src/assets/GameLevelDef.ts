@@ -31,8 +31,35 @@ export const levels: GameLevel[] = [
       },
       {
         size: 30,
-        orbitSize: 500,
+        orbitSize: 450,
         orbitDuration: 10,
+        initialAngle: 30
+      }
+    ]
+  },
+  {
+    planetSize: 1000,
+    scoreToClear: 5,
+    maxCatSpeed: 0.3,
+    maxCatJump: 0,
+    catBornInterval: 3,
+    satellaites: [
+      {
+        size: 20,
+        orbitSize: 400,
+        orbitDuration: -8,
+        initialAngle: 30
+      },
+      {
+        size: 30,
+        orbitSize: 600,
+        orbitDuration: 10,
+        initialAngle: 30
+      },
+      {
+        size: 60,
+        orbitSize: 1600,
+        orbitDuration: -12,
         initialAngle: 30
       }
     ]

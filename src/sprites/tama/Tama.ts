@@ -52,7 +52,7 @@ const tamaDefs: SpriteDef[] = [
 ]
 
 /** モーションの種類 */
-type TamaMotion = 'step' | 'jump' | 'down' | 'over' | 'none'
+type TamaMotion = 'step' | 'jump' | 'down' | 'over' | 'levelup' | 'none'
 /** たまさんの状態 */
 type State = {
   /** モーションの通番。nextMotionで使用されます */
@@ -111,6 +111,18 @@ export class Tama extends StyledContainer {
         }
         if (oldVal === 2 && newVal === 3) {
           await this.downMotion()
+        }
+      }
+    )
+
+    // レベルアップの監視
+    watch(
+      () => store.state.game.level,
+      newLv => {
+        if (newLv != 0) {
+          // レベルアップモーション
+          console.log('levelup motion')
+          this.levelUpMotion()
         }
       }
     )
@@ -264,7 +276,7 @@ export class Tama extends StyledContainer {
       })
     )
 
-    mo.alive && store.dispatch('tamaJumpEnd')
+    store.dispatch('tamaJumpEnd')
     mo.alive && this.defaultMotion()
   }
 
@@ -297,7 +309,7 @@ export class Tama extends StyledContainer {
       mo.animate(lgFr, { angle: 0 }, DUR)
     )
 
-    mo.alive && store.dispatch('tamaJumpEnd')
+    store.dispatch('tamaJumpEnd')
     mo.alive && this.defaultMotion()
   }
 
@@ -312,5 +324,18 @@ export class Tama extends StyledContainer {
       }),
       mo.animate(chara, { angle: -110 }, 1.5, Bounce.easeOut)
     )
+  }
+
+  private async levelUpMotion() {
+    const cont = this.chara // 本体
+
+    const mo = this.nextMotion('levelup')
+
+    // 予備動作
+    await mo.animate(cont, { scaleY: 0.75, angle: 15 }, 0.15, Sine.easeOut)
+    await mo.animate(cont, { scaleY: 1.1, angle: -10, y: -600 }, 3, Cubic.easeOut)
+    await mo.animate(cont, { scaleY: 1.0, angle: 0, y: 0 }, 1, Cubic.easeInOut)
+
+    mo.alive && this.defaultMotion()
   }
 }

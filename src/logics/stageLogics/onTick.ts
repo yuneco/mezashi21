@@ -63,7 +63,6 @@ export const detectCollision = (stage: GameStage) => {
     const sub = pair[0]
     // たまさんが何かに当たった
     if (sub.id === 'tama') {
-      console.log('tama hit to', pair[1])
       store.dispatch('gameOver')
     }
     // 猫がめざしに当たった

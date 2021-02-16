@@ -2,8 +2,10 @@
   <div class="GameStageRoot">
     <div class="debug">
       <div class="info">
-        LEVEL: {{ debug.level }} SCORE: {{ debug.score }}
-        <button @click="newGame">RESTART</button>
+        LEVEL: {{ debug.level }} SCORE: {{ debug.score }} <button @click="newGame">RESTART</button
+        ><br />
+        <button @click="prevLevel">◀︎ Prev Lv</button>
+        <button @click="nextLevel">Next Lv ▶︎</button>
       </div>
     </div>
     <canvas ref="canvas"></canvas>
@@ -41,11 +43,20 @@ export default defineComponent({
       }
     }
 
+    const prevLevel = () => {
+      store.dispatch('gameLevelChange', { level: Math.max(0, store.state.game.level - 1) })
+    }
+    const nextLevel = () => {
+      store.dispatch('gameLevelChange', { level: store.state.game.level + 1 })
+    }
+
     onMounted(newGame)
     return {
       debug,
       canvas,
-      newGame
+      newGame,
+      prevLevel,
+      nextLevel
     }
   }
 })

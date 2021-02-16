@@ -67,6 +67,7 @@ export default createStore<State>({
       state.tama.dir = payload.dir
     },
     setGamePlayStatus(state, payload: { playStatus: PlayStatus }) {
+      console.log('Game Play Status', payload.playStatus)
       state.game.play = payload.playStatus
     },
     setTamaJumpCount(state, payload: { jumpCount: TamaJumpCount }) {
@@ -119,7 +120,15 @@ export default createStore<State>({
       })
     },
     gameLevelUp(ctx) {
+      ctx.commit('setGamePlayStatus', { playStatus: 'transition' })
       ctx.commit('setGameLevel', { level: ctx.state.game.level + 1 })
+    },
+    gameLevelChange(ctx, payload: { level: number }) {
+      ctx.commit('setGamePlayStatus', { playStatus: 'transition' })
+      ctx.commit('setGameLevel', { level: payload.level })
+    },
+    gameLevelTransitionEnd(ctx) {
+      ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
     }
   },
   modules: {}
