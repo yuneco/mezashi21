@@ -28,10 +28,15 @@ type GameState = {
   isReloading: boolean
 }
 
+type AppColor = {
+  border: number
+}
+
 export type State = {
   stageSetting: StageSetting
   tama: TamaState
   game: GameState
+  appcolor: AppColor
 }
 
 export default createStore<State>({
@@ -55,6 +60,9 @@ export default createStore<State>({
       scoreInLevel: 0,
       balletCount: 6,
       isReloading: false
+    },
+    appcolor: {
+      border: 0x2f4753
     }
   },
   mutations: {
@@ -92,6 +100,14 @@ export default createStore<State>({
     setBallet(state, payload: { balletCount: BalletCount }) {
       state.game.balletCount = payload.balletCount
       state.game.isReloading = payload.balletCount === 0
+    },
+    setAppColor(state, payload: Partial<AppColor>) {
+      Object.entries(payload).forEach(ent => {
+        const [key, val] = ent
+        if (state.appcolor[key as keyof AppColor] && typeof val === 'number') {
+          state.appcolor[key as keyof AppColor] = val
+        }
+      })
     }
   },
   actions: {
@@ -132,10 +148,12 @@ export default createStore<State>({
     gameLevelUp(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'transition' })
       ctx.commit('setGameLevel', { level: ctx.state.game.level + 1 })
+      ctx.commit('setTamaJumpCount', { jumpCount: 0 })
     },
     gameLevelChange(ctx, payload: { level: number }) {
       ctx.commit('setGamePlayStatus', { playStatus: 'transition' })
       ctx.commit('setGameLevel', { level: payload.level })
+      ctx.commit('setTamaJumpCount', { jumpCount: 0 })
     },
     gameLevelTransitionEnd(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })

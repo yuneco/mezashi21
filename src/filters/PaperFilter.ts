@@ -5,7 +5,7 @@ const shaderSource = require('./PaperFilter.glsl').default as string
  * パステル調の表現を加えるためのフィルタです。
  */
 export default class PastelFilter extends PIXI.Filter {
-  constructor() {
+  constructor(scale = 0.8, applyAlpha = false, alphaLow = 0.23, alphaHigh = 0.4) {
     const paper = PIXI.Texture.from('/imgs/paperNoise.png')
 
     super(
@@ -18,7 +18,11 @@ export default class PastelFilter extends PIXI.Filter {
       // シェーダー側に渡すパラメータの宣言
       {
         uSize: new Float32Array([0, 0]),
-        uPaper: paper
+        uPaper: paper,
+        uApplyAlpha: applyAlpha,
+        uScale: scale,
+        uAlphaLow: alphaLow,
+        uAlphaHigh: alphaHigh
       }
     )
   }
@@ -48,8 +52,8 @@ export default class PastelFilter extends PIXI.Filter {
     ])
   }
 
-  /** フチの太さを設定します。エッジをザラザラにするノイズの量と、エッジ周辺の影の太さに影響します */
-  set thickness(v: number) {
-    this.uniforms.uThickness = v
+  /** テクスチャの適用スケールを設定します。値が大きくなるほどブレが大きくなります */
+  set scale(v: number) {
+    this.uniforms.uScale = v
   }
 }

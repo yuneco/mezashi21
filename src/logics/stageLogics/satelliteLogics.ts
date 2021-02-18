@@ -6,6 +6,7 @@ import { removeFrom } from '@/core/ArrayUtil'
 
 export const addSatellite = async (stage: GameStage, def: SatelliteSetting) => {
   const sat = new Satellite(
+    def.imgName,
     def.size,
     def.orbitSize,
     Math.abs(def.orbitDuration),

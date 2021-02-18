@@ -1,3 +1,4 @@
+import { PlanetItemName } from '@/assets/GameLevel'
 import { Planet } from '@/sprites/Planet'
 import { GameStage } from '../GameStage'
 import { setOnPlanet } from './setOnPlanet'
@@ -8,8 +9,13 @@ const removeCurrent = (planet: Planet) => {
   }
 }
 
-export const changePlanet = async (stage: GameStage, size: number) => {
-  const planet = new Planet(size)
+export const changePlanet = async (
+  stage: GameStage,
+  imgName: string,
+  size: number,
+  planetItem?: PlanetItemName
+) => {
+  const planet = new Planet(imgName, size, planetItem)
   await planet.load()
   removeCurrent(stage.planet)
   stage.planet = planet

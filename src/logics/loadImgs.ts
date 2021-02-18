@@ -62,3 +62,19 @@ export const loadSvg = async (url: string, w?: number, h?: number): Promise<PIXI
   })
   return promise
 }
+
+export const loadSprite = async (texPath: string, w?: number, h?: number) => {
+  const tex = await loadSvg(texPath, w, h)
+  return new PIXI.Sprite(tex)
+}
+
+export const loadSvgs = async (
+  ...reqs: { url: string; w?: number; h?: number }[]
+): Promise<{ [s in string]: PIXI.Texture }> => {
+  const resp: { [s in string]: PIXI.Texture } = {}
+  const tasks = reqs.map(async req => {
+    resp[req.url] = await loadSvg(req.url, req.w, req.h)
+  })
+  await Promise.all(tasks)
+  return resp
+}

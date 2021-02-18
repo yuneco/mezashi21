@@ -5,13 +5,18 @@ uniform sampler2D uSampler;
 
 uniform vec2 uSize;
 uniform sampler2D uPaper;
+uniform float uScale;
+uniform bool uApplyAlpha;
+uniform float uAlphaLow;
+uniform float uAlphaHigh;
 
 /* フィルタのメイン処理 */
 void main(void) {
-  vec2 tex = texture2D(uPaper, fract(vTextureCoord * 1.)).xy;
+  vec4 texC = texture2D(uPaper, fract(vTextureCoord * uSize * 0.01 / uScale));
+  vec2 tex = texC.xy;
   tex -= vec2(0.5, 0.5);
-  tex.x *= 256. / uSize.x * 0.008;
-  tex.y *= 256. / uSize.y * 0.008;
+  tex *= 256. / uSize * uScale * 0.01;
   vec4 c = texture2D(uSampler, vTextureCoord + tex);
-  gl_FragColor = c;
+  float a = uApplyAlpha ? smoothstep(uAlphaLow, uAlphaHigh, texC.r) : 1.0;
+  gl_FragColor = c * a;
 }

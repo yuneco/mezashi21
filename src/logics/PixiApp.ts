@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import store from '@/store'
+import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom'
 
 const defineStageSize = () => {
   // base: 375 * 630
@@ -50,6 +51,14 @@ export class PixiApp extends PIXI.Application {
     this.world = world
     this.stage.addChild(world)
     world.scale.set(size.scale)
+    // world.filters = [
+    //   new AdvancedBloomFilter({
+    //     threshold: 0.1,
+    //     bloomScale: 0.5,
+    //     brightness: 0.55,
+    //     blur: 0.5
+    //   })
+    // ]
 
     const bgLayer = new PIXI.Container()
     this.world.addChild(bgLayer)

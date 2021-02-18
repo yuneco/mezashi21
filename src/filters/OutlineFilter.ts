@@ -1,3 +1,4 @@
+import store from '@/store'
 import * as PIXI from 'pixi.js'
 const shaderSource = require('./OutlineFilter.glsl').default as string
 
@@ -35,6 +36,7 @@ export default class PastelFilter extends PIXI.Filter {
     clear: PIXI.CLEAR_MODES
   ): void {
     this.padding = this.thickness
+    this.uniforms.uColor = this.colorNumToVec(store.state.appcolor.border)
     this.uniforms.uSize[0] = input._frame.width
     this.uniforms.uSize[1] = input._frame.height
     this.uniforms.uThickness[0] = this.thickness / input._frame.width

@@ -2,9 +2,9 @@ import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
 
 import store from '@/store'
-import { animate } from './core/animate'
+import { animate } from '../core/animate'
 import { sleep } from '@/core/sleep'
-import { StyledContainer } from './core/StyledContainer'
+import { StyledContainer } from '../core/StyledContainer'
 
 const MINSCALE = 0.1
 const MAXSCALE = 2.0

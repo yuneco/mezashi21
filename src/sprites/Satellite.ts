@@ -4,6 +4,7 @@ import { StyledContainer } from './core/StyledContainer'
 import PaperFilter from '@/filters/PaperFilter'
 import { rotate } from './motions/rotate'
 import { blink } from './motions/blink'
+import store from '@/store'
 
 let instanseSeq = 0
 
@@ -11,13 +12,15 @@ export class Satellite extends PIXI.Container {
   readonly cont: PIXI.Container
   private approachIndicator = new StyledContainer()
   private readonly _id = instanseSeq++
+  private readonly imgName: string
   private direction: 'clockwise' | 'unticlockwise' = 'clockwise'
   private sizeVal: number
   private orbitSizeVal: number
   private orbitG?: PIXI.Graphics
 
-  constructor(size = 30, orbit = 300, dur = 8, isClockwise = true) {
+  constructor(imgName: string, size = 30, orbit = 300, dur = 8, isClockwise = true) {
     super()
+    this.imgName = imgName
     this.sizeVal = size
     this.orbitSizeVal = orbit
     this.direction = isClockwise ? 'clockwise' : 'unticlockwise'
@@ -44,9 +47,9 @@ export class Satellite extends PIXI.Container {
       this.removeChild(this.orbitG)
     }
     const g = (this.orbitG = new PIXI.Graphics())
-    g.lineStyle(2, 0x614d3e)
+    g.lineStyle(2, store.state.appcolor.border)
     g.drawCircle(0, 0, this.orbitSizeVal / 2)
-    g.filters = [new PaperFilter()]
+    g.filters = [new PaperFilter(1.5, true)]
     this.addChildAt(g, 0)
     // 衛星本体と侵入検知用のマーカーの高さを合わせる
     const elems = [this.cont, this.approachIndicator]
@@ -56,7 +59,7 @@ export class Satellite extends PIXI.Container {
   }
 
   async load() {
-    const sp = new PIXI.Sprite(await loadSvg('/imgs/Planet2.svg'))
+    const sp = new PIXI.Sprite(await loadSvg(`/imgs/${this.imgName}.svg`))
     const indicatorSp = new PIXI.Sprite(await loadSvg('/imgs/Warning.svg', 40))
     blink(indicatorSp, 0.15, Infinity)
     indicatorSp.angle = 180
