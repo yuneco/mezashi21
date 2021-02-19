@@ -4,6 +4,7 @@ import { GameStage } from '../GameStage'
 import { setOnPlanet } from './setOnPlanet'
 import store from '@/store'
 import { levels } from '@/assets/GameLevelDef'
+import { randomBetween } from '@/utils/MathUtil'
 
 const randomBased = (base: number, lowerTimes: number, upperTimes: number): number => {
   return base * (lowerTimes + (upperTimes - lowerTimes) * Math.random())
@@ -25,7 +26,7 @@ export const addCat = async (stage: GameStage) => {
   cat.direction = isDirRight ? 'right' : 'left'
   cat.speed = catSpeed
   cat.jumpHeight = jumpHeight
-  cat.angle = stage.tama.angle + 120 * (isDirRight ? 1 : -1)
+  cat.angle = stage.tama.angle + randomBetween(90, 130) * (isDirRight ? 1 : -1)
   stage.app.cameraLayer.addChild(cat)
   setOnPlanet(stage.planet, true, cat)
 }

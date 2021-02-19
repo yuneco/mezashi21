@@ -13,6 +13,8 @@
     "@pixi/filter-bloom": "^3.2.0",
     "@pixi/filter-glow": "^3.2.0",
     "@types/box-intersect": "^1.0.0",
+    "audio-loader": "^1.0.3",
+    "audio-play": "^2.3.1",
     "box-intersect": "^1.0.2",
     "core-js": "^3.6.5",
     "gsap": "^3.6.0",
@@ -23,6 +25,7 @@
     "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@types/audio-play": "^2.2.0",
     "@types/noisejs": "^0.0.28",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",

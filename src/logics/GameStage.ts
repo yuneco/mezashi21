@@ -31,6 +31,7 @@ import { StageTheme } from '@/assets/StageTheme'
 import { WaterBg } from '@/sprites/bgs/WaterBg'
 import { UniverseBg } from '@/sprites/bgs/UniverseBg'
 import { DuskSkyBg } from '@/sprites/bgs/DuskSkyBg'
+import playSound from './playSound'
 
 export class GameStage {
   readonly app: PixiApp
@@ -98,6 +99,7 @@ export class GameStage {
 
     const isLevelupTransition = store.state.game.play === 'transition'
     if (isLevelupTransition) {
+      playSound('lvup')
       await gsap.to(this.app, { cameraY: 1.1, cameraZoom: 2.5, duration: 2.5, ease: Cubic.easeOut })
     }
 
@@ -169,8 +171,11 @@ export class GameStage {
     // めざし発射
     const isFireable = store.state.game.balletCount > 0
     if (isFireable) {
+      playSound('shot')
       store.dispatch('gameFireBallet')
       addMezashi(this, local)
+    } else {
+      playSound('miss')
     }
     // タップの方向に合わせてたまさんの向きを変える
     const size = ev.data.global.x < store.state.stageSetting.width / 2 ? 'left' : 'right'

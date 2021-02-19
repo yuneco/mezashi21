@@ -5,6 +5,7 @@ import { removeCat } from './catLogic'
 import { Tama } from '@/sprites/Tama'
 import { Cat } from '@/sprites/Cat'
 import { Satellite } from '@/sprites/Satellite'
+import playSound from '../playSound'
 
 const indecatorAngleForOrbit = (orbit: number) => {
   const width = store.state.stageSetting.vw
@@ -63,12 +64,14 @@ export const detectCollision = (stage: GameStage) => {
     const sub = pair[0]
     // たまさんが何かに当たった
     if (sub.id === 'tama') {
+      playSound('gameover')
       store.dispatch('gameOver')
     }
     // 猫がめざしに当たった
     if (sub.category === 'cat') {
       const cat = stage.cats.find(cat => cat.id === sub.id)
       if (cat) {
+        playSound('catch')
         store.dispatch('gameIncrementScore')
         removeCat(stage, cat)
       }

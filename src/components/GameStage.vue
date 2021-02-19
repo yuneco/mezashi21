@@ -18,6 +18,7 @@ import { defineComponent, ref, onMounted, reactive, computed } from 'vue'
 import { GameStage as GameStageClass } from '@/logics/GameStage'
 import { useStore } from 'vuex'
 import { State as StoreState } from '@/store'
+import playSound from '@/logics/playSound'
 
 export default defineComponent({
   name: 'GameStage',
@@ -32,6 +33,7 @@ export default defineComponent({
     const canvas = ref<HTMLCanvasElement>()
 
     const newGame = async () => {
+      playSound('btn')
       const canvasEl = canvas.value
       if (canvasEl) {
         store.dispatch('newGame')
