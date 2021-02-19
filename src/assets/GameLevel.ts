@@ -1,6 +1,5 @@
 import { themes } from './StageThemeDef'
-
-export type PlanetItemName = 'flower' | 'ice'
+import { items } from './PlanetItemDef'
 
 export type SatelliteSetting = {
   /** 衛星の直径 */
@@ -21,7 +20,7 @@ export type GameLevel = {
   /** 惑星のサイズ */
   readonly planetSize: number
   /** 惑星に配置する装飾アイテム（オプション） */
-  readonly planetItem?: PlanetItemName
+  readonly planetItem?: keyof typeof items
   /** 惑星のテクスチャパス */
   readonly planetImgName: string
   /** 衛星の定義 */

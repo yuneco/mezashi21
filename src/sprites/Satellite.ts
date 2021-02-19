@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
-import { StyledContainer } from './core/StyledContainer'
+import { StyledContainer } from './StyledContainer'
 import PaperFilter from '@/filters/PaperFilter'
 import { rotate } from './motions/rotate'
 import { blink } from './motions/blink'
@@ -59,7 +59,7 @@ export class Satellite extends PIXI.Container {
   }
 
   async load() {
-    const sp = new PIXI.Sprite(await loadSvg(`/imgs/${this.imgName}.svg`))
+    const sp = new PIXI.Sprite(await loadSvg(`/imgs/planets/${this.imgName}.svg`))
     const indicatorSp = new PIXI.Sprite(await loadSvg('/imgs/Warning.svg', 40))
     blink(indicatorSp, 0.15, Infinity)
     indicatorSp.angle = 180

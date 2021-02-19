@@ -1,78 +1,42 @@
 import { GameLevel } from './GameLevel'
 
 export const levels: GameLevel[] = [
+  // Lv1
   {
-    themeName: 'night',
+    themeName: 'sky',
     planetSize: 500,
-    planetImgName: 'Planet6',
-    planetItem: undefined,
+    planetImgName: 'Planet1',
+    planetItem: 'redFlower',
     scoreToClear: 5,
     maxCatSpeed: 0.2,
     maxCatJump: 0,
     catBornInterval: 3,
-    satellaites: [
-      {
-        size: 70,
-        imgName: 'Planet2',
-        orbitSize: 800,
-        orbitDuration: -11,
-        initialAngle: 30
-      }
-    ]
+    satellaites: []
   },
   {
     themeName: 'sky',
     planetSize: 800,
     planetImgName: 'Planet3',
-    planetItem: 'flower',
+    planetItem: 'redFlower',
     scoreToClear: 5,
-    maxCatSpeed: 0.4,
-    maxCatJump: 500,
+    maxCatSpeed: 0.25,
+    maxCatJump: 20,
     catBornInterval: 3,
-    satellaites: [
-      {
-        size: 120,
-        imgName: 'Planet4',
-        orbitSize: 1100,
-        orbitDuration: -8,
-        initialAngle: 30
-      },
-      {
-        size: 30,
-        imgName: 'Planet5',
-        orbitSize: 450,
-        orbitDuration: 10,
-        initialAngle: 30
-      }
-    ]
+    satellaites: []
   },
   {
     themeName: 'sky',
     planetSize: 1000,
     planetImgName: 'Planet6',
     scoreToClear: 5,
-    maxCatSpeed: 0.6,
-    maxCatJump: 2000,
-    catBornInterval: 3,
+    maxCatSpeed: 0.28,
+    maxCatJump: 100,
+    catBornInterval: 2.8,
     satellaites: [
       {
-        size: 20,
-        imgName: 'Planet7',
-        orbitSize: 400,
-        orbitDuration: -8,
-        initialAngle: 30
-      },
-      {
-        size: 30,
-        imgName: 'Planet8',
-        orbitSize: 600,
-        orbitDuration: 10,
-        initialAngle: 30
-      },
-      {
         size: 60,
-        imgName: 'Planet1',
-        orbitSize: 1600,
+        imgName: 'Planet3',
+        orbitSize: 1500,
         orbitDuration: -12,
         initialAngle: 30
       }

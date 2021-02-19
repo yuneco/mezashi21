@@ -1,4 +1,4 @@
-import { sleep } from '@/core/sleep'
+import { sleep } from '@/utils/sleep'
 
 export const blink = async (o: PIXI.DisplayObject, interval: number, times: number) => {
   let count = 0

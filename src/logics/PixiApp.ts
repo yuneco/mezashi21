@@ -1,6 +1,10 @@
 import * as PIXI from 'pixi.js'
 import store from '@/store'
-import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom'
+//import { AdvancedBloomFilter } from '@pixi/filter-advanced-bloom'
+import { BloomFilter } from '@pixi/filter-bloom'
+import { AdjustmentFilter } from '@pixi/filter-adjustment'
+import { GlowFilter } from '@pixi/filter-glow'
+import { loadSvg } from './loadImgs'
 
 const defineStageSize = () => {
   // base: 375 * 630
@@ -25,6 +29,7 @@ const getGlobalAngle = (o: PIXI.DisplayObject): number => {
 export class PixiApp extends PIXI.Application {
   readonly world: PIXI.Container
   readonly cameraLayer: PIXI.Container
+  readonly frontLayer: PIXI.Container
   readonly bgLayer: PIXI.Container
   private _cameraFocusObject?: PIXI.DisplayObject
   cameraY: number
@@ -44,6 +49,7 @@ export class PixiApp extends PIXI.Application {
     })
     PIXI.settings.FILTER_RESOLUTION = window.devicePixelRatio || 1
 
+    // ワールド = ステージ直下のスケール調整されたレイヤー
     const world = new PIXI.Container()
     world.name = 'world'
     world.width = size.vw
@@ -51,19 +57,13 @@ export class PixiApp extends PIXI.Application {
     this.world = world
     this.stage.addChild(world)
     world.scale.set(size.scale)
-    // world.filters = [
-    //   new AdvancedBloomFilter({
-    //     threshold: 0.1,
-    //     bloomScale: 0.5,
-    //     brightness: 0.55,
-    //     blur: 0.5
-    //   })
-    // ]
 
+    // 背景レイヤー = ワールド下層の固定位置レイヤー
     const bgLayer = new PIXI.Container()
     this.world.addChild(bgLayer)
     this.bgLayer = bgLayer
 
+    // カメラレイヤー = メインのキャラクター配置レイヤー。カメラ追従
     const cameraLayer = new PIXI.Container()
     cameraLayer.width = size.vw
     cameraLayer.height = size.vh
@@ -71,6 +71,11 @@ export class PixiApp extends PIXI.Application {
     this.world.addChild(cameraLayer)
     this.cameraY = 0.75
     this.cameraZoom = 1.0
+
+    // 前面レイヤー = ワールド上層の固定位置レイヤー
+    const frontLayer = new PIXI.Container()
+    this.world.addChild(frontLayer)
+    this.frontLayer = frontLayer
 
     store.commit('setStageSetting', {
       width: size.width,
@@ -115,5 +120,30 @@ export class PixiApp extends PIXI.Application {
   set cameraFocusObject(v) {
     this._cameraFocusObject = v
     this.moveCamera()
+  }
+
+  async setStageFilter(filterType?: 'water' | 'dark') {
+    this.stage.filters = []
+    this.cameraLayer.filters = []
+    if (!filterType) {
+      return
+    }
+    if (filterType === 'water') {
+      const tex = new PIXI.Sprite(
+        await loadSvg(
+          '/imgs/paperNoise2.png',
+          store.state.stageSetting.width,
+          store.state.stageSetting.height
+        )
+      )
+      this.stage.filters = [new PIXI.filters.DisplacementFilter(tex, 12)]
+    }
+    if (filterType === 'dark') {
+      this.cameraLayer.filters = [
+        new AdjustmentFilter({ gamma: 0.2, saturation: 0.8, brightness: 0.25, red: 1.3 }),
+        new BloomFilter(6),
+        new GlowFilter({ innerStrength: 1.8, outerStrength: 1, color: 0xe1ae89 })
+      ]
+    }
   }
 }

@@ -952,6 +952,11 @@
     "@pixi/math" "5.3.7"
     "@pixi/utils" "5.3.7"
 
+"@pixi/filter-adjustment@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@pixi/filter-adjustment/-/filter-adjustment-3.1.1.tgz#2aa41048106fa2006648deae59813bfb55c8fe54"
+  integrity sha512-N+qbkofBn5tiGn2Ubg52AEoPOM69VIO5TEHsBtm5oh2S4m/rb6FnnqPji/FzwK89iLvtYmJdbwWAYi87PWnE3Q==
+
 "@pixi/filter-advanced-bloom@^3.2.0":
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/@pixi/filter-advanced-bloom/-/filter-advanced-bloom-3.2.0.tgz#c345adebf6605d814fb7ff8fda2292ed3d04ec01"
@@ -965,6 +970,11 @@
   integrity sha512-jkvbzmSCIPjCJMFNUocAxsZ7Cq3ssFwXnmXNYKYhJy01LxiyO/JbVDAxAD7Chyn5jbKsI21OV3UQaIJhFpXw7Q==
   dependencies:
     "@pixi/core" "5.3.7"
+
+"@pixi/filter-bloom@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@pixi/filter-bloom/-/filter-bloom-3.2.0.tgz#36f9e36ae02b1d6ba0c3560b687807df509b276a"
+  integrity sha512-+biXmn28govp6l0FCQ463n/ZqQpfqMp/nTwQp9++Y5N7Aw7IzuJLlgC5p44U/wd75uAQDCamt+FmRU5dsAjIFg==
 
 "@pixi/filter-blur@5.3.7":
   version "5.3.7"
@@ -995,6 +1005,11 @@
   integrity sha512-NJpVcbOCUVYUDGqxvh7Jp/+arWEnLKgI/7Qf8VEYv0aQslqE8ZtFSAX7JfP+iGfFWXlkMe6AKspesYhUrIpRKg==
   dependencies:
     "@pixi/core" "5.3.7"
+
+"@pixi/filter-glow@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@pixi/filter-glow/-/filter-glow-3.2.0.tgz#704c4991bbe726969df3863df31318ea5b42f4c9"
+  integrity sha512-+rOpzHh0VBjjvBO0A6ROiO8JGcCQU0Uqfeg1zX/MKaF3pcGnDlNvBa8kQaDsLnSvBmMzajBLzQYC4braD8oVYw==
 
 "@pixi/filter-kawase-blur@3.2.0":
   version "3.2.0"
@@ -1344,6 +1359,11 @@
   version "14.14.22"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.22.tgz#0d29f382472c4ccf3bd96ff0ce47daf5b7b84b18"
   integrity sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
+
+"@types/noisejs@^0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@types/noisejs/-/noisejs-0.0.28.tgz#797ac259d592004f8e13526cc9afeaf9f1fcb26e"
+  integrity sha1-eXrCWdWSAE+OE1Jsya/q+fH8sm4=
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -6323,6 +6343,11 @@ node-releases@^1.1.69:
   version "1.1.70"
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-1.1.70.tgz#66e0ed0273aa65666d7fe78febe7634875426a08"
   integrity sha512-Slf2s69+2/uAD79pVVQo8uSiC34+g8GWY8UH2Qtqv34ZfhYrxpYpfzs9Js9d6O0mbDmALuxaTlplnBTnSELcrw==
+
+noisejs@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/noisejs/-/noisejs-2.1.0.tgz#84b4c4cd04ff43367034f65253e213e0d9fe1aff"
+  integrity sha1-hLTEzQT/QzZwNPZSU+IT4Nn+Gv8=
 
 normalize-package-data@^2.5.0:
   version "2.5.0"

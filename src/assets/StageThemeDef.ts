@@ -2,7 +2,7 @@ import { StageTheme } from './StageTheme'
 
 export const sky: StageTheme = {
   name: 'Sky',
-  imgDir: 'imgs/bg/sky',
+  imgDir: '/imgs/bg/sky',
   colors: {
     border: 0x4f7884
   },
@@ -18,7 +18,7 @@ export const sky: StageTheme = {
 
 export const night: StageTheme = {
   name: 'Night',
-  imgDir: 'imgs/bg/night',
+  imgDir: '/imgs/bg/night',
   colors: {
     border: 0xc0a3a9
   },
@@ -38,7 +38,7 @@ export const night: StageTheme = {
 
 export const snow: StageTheme = {
   name: 'Snow',
-  imgDir: 'imgs/bg/snow',
+  imgDir: '/imgs/bg/snow',
   colors: {
     border: 0x598d9a
   },
@@ -49,15 +49,73 @@ export const snow: StageTheme = {
     'Snow4.svg',
     'Snow3.svg',
     'Snow2.svg',
-    'Snow1.svg',
-    'Ice3.svg',
-    'Ice2.svg',
-    'Ice1.svg'
+    'Snow1.svg'
+  ]
+}
+
+export const water: StageTheme = {
+  name: 'UnderWater',
+  imgDir: '/imgs/bg/water',
+  colors: {
+    border: 0x416c79
+  },
+  preloads: [
+    'Wave3.svg',
+    'Wave2.svg',
+    'Wave1.svg',
+    'WaterBubble4.svg',
+    'WaterBubble3.svg',
+    'WaterBubble2.svg',
+    'WaterBubble1.svg',
+    'WaterBg.svg'
+  ]
+}
+
+export const univ: StageTheme = {
+  name: 'Universe',
+  imgDir: '/imgs/bg/univ',
+  colors: {
+    border: 0x25221c
+  },
+  preloads: [
+    'UnivSky.svg',
+    'Dust8.svg',
+    'Dust7.svg',
+    'Dust6.svg',
+    'Dust5.svg',
+    'Dust4.svg',
+    'Dust3.svg',
+    'Dust2.svg',
+    'Dust1.svg',
+    'Asteroids.svg'
+  ]
+}
+
+export const dusk: StageTheme = {
+  name: 'Dusk',
+  imgDir: '/imgs/bg/dusk',
+  colors: {
+    border: 0x585356
+  },
+  preloads: [
+    'UnivSky.svg',
+    'Dust8.svg',
+    'Dust7.svg',
+    'Dust6.svg',
+    'Dust5.svg',
+    'Dust4.svg',
+    'Dust3.svg',
+    'Dust2.svg',
+    'Dust1.svg',
+    'Asteroids.svg'
   ]
 }
 
 export const themes = {
   sky,
   night,
-  snow
+  snow,
+  water,
+  univ,
+  dusk
 }

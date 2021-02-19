@@ -1,4 +1,4 @@
-import { PlanetItemName } from '@/assets/GameLevel'
+import { items } from '@/assets/PlanetItemDef'
 import { Planet } from '@/sprites/Planet'
 import { GameStage } from '../GameStage'
 import { setOnPlanet } from './setOnPlanet'
@@ -13,7 +13,7 @@ export const changePlanet = async (
   stage: GameStage,
   imgName: string,
   size: number,
-  planetItem?: PlanetItemName
+  planetItem?: keyof typeof items
 ) => {
   const planet = new Planet(imgName, size, planetItem)
   await planet.load()

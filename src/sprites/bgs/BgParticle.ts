@@ -1,10 +1,10 @@
 import * as PIXI from 'pixi.js'
 
 import store from '@/store'
-import { animate } from '../core/animate'
-import { sleep } from '../../core/sleep'
-import { StyledContainer } from '../core/StyledContainer'
-import { randomFrom } from '@/core/ArrayUtil'
+import { animate } from '../../logics/animate'
+import { sleep } from '../../utils/sleep'
+import { StyledContainer } from '../StyledContainer'
+import { randomFrom } from '@/utils/ArrayUtil'
 
 type ParticleDirection = 'up' | 'down'
 
@@ -27,6 +27,7 @@ export class BgParticle extends StyledContainer {
   private maxDuration = 4.5
   private minRotate = 120
   private maxRotate = 400
+  private xNoiseScale = 1
   direction: ParticleDirection = 'up'
   maxInterval = 5000
 
@@ -84,7 +85,11 @@ export class BgParticle extends StyledContainer {
     this.textures.length = 0
     this.textures.push(...textures)
     for (let index = 0; index < this.maxCountVal; index++) {
+      if (this.isDisposed) {
+        break
+      }
       this.addParticle()
+      await sleep(10)
     }
   }
 

@@ -1,5 +1,6 @@
+import * as PIXI from 'pixi.js'
 import { PixiApp } from './PixiApp'
-import { Tama } from '@/sprites/tama/Tama'
+import { Tama } from '@/sprites/Tama'
 import { Cat } from '@/sprites/Cat'
 import { Planet } from '@/sprites/Planet'
 import { Mezashi } from '@/sprites/Mezashi'
@@ -21,12 +22,15 @@ import { addSatellite, clearSatellites } from './stageLogics/satelliteLogics'
 import { levels } from '@/assets/GameLevelDef'
 import { watch } from 'vue'
 import gsap, { Cubic } from 'gsap'
-import { sleep } from '@/core/sleep'
+import { sleep } from '@/utils/sleep'
 import { StageBackground } from '@/sprites/bgs/StageBackground'
 import { NightSkyBg } from '@/sprites/bgs/NightSkyBg'
 import { themes } from '@/assets/StageThemeDef'
 import { SnowSkyBg } from '@/sprites/bgs/SnowSkyBg'
 import { StageTheme } from '@/assets/StageTheme'
+import { WaterBg } from '@/sprites/bgs/WaterBg'
+import { UniverseBg } from '@/sprites/bgs/UniverseBg'
+import { DuskSkyBg } from '@/sprites/bgs/DuskSkyBg'
 
 export class GameStage {
   readonly app: PixiApp
@@ -184,6 +188,13 @@ export class GameStage {
     if (name === 'sky') bg = new CloudSkyBg()
     if (name === 'snow') bg = new SnowSkyBg()
     if (name === 'night') bg = new NightSkyBg()
+    if (name === 'water') bg = new WaterBg()
+    if (name === 'univ') bg = new UniverseBg(this.app.frontLayer)
+    if (name === 'dusk') bg = new DuskSkyBg()
+
+    this.app.setStageFilter()
+    if (name === 'water') this.app.setStageFilter('water')
+    if (name === 'dusk') this.app.setStageFilter('dark')
 
     if (!bg) {
       return

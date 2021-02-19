@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
-import { StyledContainer } from './core/StyledContainer'
-import { animate } from './core/animate'
+import { StyledContainer } from './StyledContainer'
+import { animate } from '../logics/animate'
 import { Linear } from 'gsap'
 
 let instanseSeq = 0

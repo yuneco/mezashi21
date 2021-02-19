@@ -8,17 +8,22 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@pixi/filter-adjustment": "^3.1.1",
     "@pixi/filter-advanced-bloom": "^3.2.0",
+    "@pixi/filter-bloom": "^3.2.0",
+    "@pixi/filter-glow": "^3.2.0",
     "@types/box-intersect": "^1.0.0",
     "box-intersect": "^1.0.2",
     "core-js": "^3.6.5",
     "gsap": "^3.6.0",
+    "noisejs": "^2.1.0",
     "pixi.js": "^5.3.7",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
+    "@types/noisejs": "^0.0.28",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",

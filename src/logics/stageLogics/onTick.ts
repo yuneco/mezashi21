@@ -2,7 +2,7 @@ import { GameStage } from '../GameStage'
 import store from '@/store'
 import { CollidableObject } from '../CollisionDetector'
 import { removeCat } from './catLogic'
-import { Tama } from '@/sprites/tama/Tama'
+import { Tama } from '@/sprites/Tama'
 import { Cat } from '@/sprites/Cat'
 import { Satellite } from '@/sprites/Satellite'
 

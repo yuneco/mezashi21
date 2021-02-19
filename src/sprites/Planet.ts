@@ -1,11 +1,15 @@
 import * as PIXI from 'pixi.js'
 import { loadSvg } from '@/logics/loadImgs'
-import { StyledContainer } from './core/StyledContainer'
+import { StyledContainer } from './StyledContainer'
 import store from '@/store'
-import { Flower } from './Flower'
-import { Ice } from './Ice'
-import { PlanetItemName } from '@/assets/GameLevel'
+import { items } from '@/assets/PlanetItemDef'
+import { randomBetween, randomIntBetween } from '@/utils/MathUtil'
+import { createPlanetItem } from './planetItems/createPlanetItem'
+import { notNull } from '@/utils/ArrayUtil'
 
+type PlanetItemName = keyof typeof items
+
+/** 惑星本体に適用するフィルタ定義 */
 const planetFilterOption = {
   outline: {
     scale: 4
@@ -15,6 +19,7 @@ const planetFilterOption = {
   }
 }
 
+/** 装飾のPlanetItemに適用するフィルタ定義 */
 const itemFilterOption = {
   outline: {
     enabled: false
@@ -31,20 +36,13 @@ export class Planet extends PIXI.Container {
   private cont = new StyledContainer(planetFilterOption)
   private items = new PIXI.Container()
   private itemName?: PlanetItemName
+
   constructor(imgName: string, size = 300, itemName?: PlanetItemName) {
     super()
     this.imgName = imgName
     this.sizeVal = size
     this.baseSize = size
     this.itemName = itemName
-  }
-
-  private applySize() {
-    if (!this.cont) {
-      return
-    }
-    const scale = this.sizeVal / this.baseSize
-    this.cont.scale.set(scale, scale)
   }
 
   async load() {
@@ -57,56 +55,53 @@ export class Planet extends PIXI.Container {
     this.addChild(this.cont)
     this.pivot.x = this.width / 2
     this.pivot.y = this.height / 2
-    this.applySize()
+    const scale = this.sizeVal / this.baseSize
+    this.cont.scale.set(scale, scale)
 
-    this.itemName === 'ice' && this.addIces(12)
-    this.itemName === 'flower' && this.addFlowers(12)
+    this.initTap(sprite)
 
-    sprite.interactive = true
-    sprite.on('pointertap', (ev: PIXI.InteractionEvent) => {
+    // アイテム配置
+    this.itemName === 'ice' && this.addPlanetItem('ice', 8, 12, 50, 100)
+    this.itemName === 'redFlower' && this.addPlanetItem('redFlower', 6, 18, 100, 200)
+    this.itemName === 'goldFlower' && this.addPlanetItem('goldFlower', 20, 45, 80, 150)
+    this.itemName === 'waterGrass' && this.addPlanetItem('waterGrass', 12, 35, 100, 300)
+  }
+
+  /** タップイベントを登録します。ロード処理の一部です */
+  private initTap(planetBodySprite: PIXI.Sprite) {
+    planetBodySprite.interactive = true
+    planetBodySprite.on('pointertap', (ev: PIXI.InteractionEvent) => {
       const SAFE_MARGIN = 0.05 // 5%
-      const pos = sprite.toLocal(ev.data.global)
+      const pos = planetBodySprite.toLocal(ev.data.global)
       const dist = Math.hypot(pos.x, pos.y)
-      if (dist < (sprite.width / 2) * (1 - SAFE_MARGIN)) {
+      if (dist < (planetBodySprite.width / 2) * (1 - SAFE_MARGIN)) {
         ev.stopPropagation()
         store.dispatch('tamaJump')
       }
     })
   }
 
-  /**
-   * 花を植えます
-   * @param maxCount 最大数
-   */
-  private async addFlowers(maxCount: number) {
-    const count = Math.ceil(Math.random() * maxCount)
-    const MIN_H = 100
-    const MAX_H = 200
-    const rndLen = () => MIN_H + (MAX_H - MIN_H) * Math.random()
-    const fls = new Array(count).fill(0).map(() => new Flower(rndLen(), itemFilterOption))
-    await Promise.all(fls.map(fl => fl.load()))
-    fls.forEach(fl => {
-      this.placeItem(fl, Math.random() * 360)
+  /** 地面に指定したPlanetItemを生成・配置します */
+  private async addPlanetItem(
+    itemName: keyof typeof items,
+    minCount: number,
+    maxCount: number,
+    minSize: number,
+    maxSize: number
+  ) {
+    const count = randomIntBetween(minCount, maxCount)
+    const items = new Array(count)
+      .fill(0)
+      .map(() => createPlanetItem(itemName, randomBetween(minSize, maxSize), itemFilterOption))
+      .filter(notNull)
+    await Promise.all(items.map(item => item.load()))
+    items.forEach(item => {
+      this.placeOnGround(item, Math.random() * 360)
     })
   }
 
-  /**
-   *
-   * @param maxCount 氷を配置します
-   */
-  private async addIces(maxCount: number) {
-    const count = Math.ceil(Math.random() * maxCount)
-    const MIN_W = 50
-    const MAX_W = 100
-    const rndSize = () => MIN_W + (MAX_W - MIN_W) * Math.random()
-    const ices = new Array(count).fill(0).map(() => new Ice(rndSize(), itemFilterOption))
-    await Promise.all(ices.map(ice => ice.load()))
-    ices.forEach(ice => {
-      this.placeItem(ice, Math.random() * 360)
-    })
-  }
-
-  private placeItem(item: PIXI.Container, angle = 0) {
+  /** 指定のオブジェクトを角度を指定して惑星の地面位置にして配置します。PlanetItemの配置に利用することを想定しています */
+  private placeOnGround(item: PIXI.Container, angle = 0) {
     const wrapper = new PIXI.Container()
     wrapper.addChild(item)
     wrapper.position.set(this.pivot.x, this.pivot.y)
@@ -115,12 +110,8 @@ export class Planet extends PIXI.Container {
     this.items.addChild(wrapper)
   }
 
+  /** 惑星サイズ */
   get size(): number {
     return this.sizeVal
-  }
-
-  set size(v: number) {
-    this.sizeVal = v
-    this.applySize()
   }
 }

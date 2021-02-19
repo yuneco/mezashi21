@@ -1,4 +1,4 @@
-import { removeFrom } from '@/core/ArrayUtil'
+import { removeFrom } from '@/utils/ArrayUtil'
 import { Cat } from '@/sprites/Cat'
 import { GameStage } from '../GameStage'
 import { setOnPlanet } from './setOnPlanet'

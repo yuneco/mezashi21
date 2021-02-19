@@ -2,7 +2,7 @@ import { GameStage } from '../GameStage'
 import { setOnPlanet } from './setOnPlanet'
 import { SatelliteSetting } from '@/assets/GameLevel'
 import { Satellite } from '@/sprites/Satellite'
-import { removeFrom } from '@/core/ArrayUtil'
+import { removeFrom } from '@/utils/ArrayUtil'
 
 export const addSatellite = async (stage: GameStage, def: SatelliteSetting) => {
   const sat = new Satellite(

@@ -1,7 +1,7 @@
 import { Mezashi } from '@/sprites/Mezashi'
 import { GameStage } from '../GameStage'
-import { angleOfPoints } from '../coordUtils'
-import { removeFrom } from '@/core/ArrayUtil'
+import { angleOfPoints } from '../../utils/coordUtils'
+import { removeFrom } from '@/utils/ArrayUtil'
 import store from '@/store'
 
 export const addMezashi = async (stage: GameStage, aimTo: PIXI.Point) => {
