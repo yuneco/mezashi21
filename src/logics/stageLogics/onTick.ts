@@ -5,7 +5,10 @@ import { removeCat } from './catLogic'
 import { Tama } from '@/sprites/Tama'
 import { Cat } from '@/sprites/Cat'
 import { Satellite } from '@/sprites/Satellite'
-import playSound from '../playSound'
+import playSound, { repeatSound } from '../playSound'
+
+let lastApproachTime = 0
+const APPLOACH_SND_MIN_INTERVAL = 500
 
 const indecatorAngleForOrbit = (orbit: number) => {
   const width = store.state.stageSetting.vw
@@ -116,4 +119,11 @@ export const updateSatIndicator = (sat: Satellite, tamaAngle: number) => {
   sat.IndicatorAngle = isApproaching
     ? baseAngle + IndicatorAngle * (sat.isClockwise ? -1 : 1)
     : undefined
+  if (isApproaching) {
+    const now = Date.now()
+    if (now - lastApproachTime > APPLOACH_SND_MIN_INTERVAL) {
+      repeatSound('warn', 3)
+    }
+    lastApproachTime = now
+  }
 }
