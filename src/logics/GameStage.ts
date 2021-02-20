@@ -19,7 +19,7 @@ import {
 import { AutoCatMaker } from './stageLogics/AutoCatMaker'
 import { changePlanet } from './stageLogics/planetLogics'
 import { addSatellite, clearSatellites } from './stageLogics/satelliteLogics'
-import { levels, openingLevel, unknownLevel } from '@/assets/GameLevelDef'
+import { openingLevel } from '@/assets/GameLevelDef'
 import { watch } from 'vue'
 import gsap, { Cubic } from 'gsap'
 import { sleep } from '@/utils/sleep'
@@ -32,6 +32,7 @@ import { WaterBg } from '@/sprites/bgs/WaterBg'
 import { UniverseBg } from '@/sprites/bgs/UniverseBg'
 import { DuskSkyBg } from '@/sprites/bgs/DuskSkyBg'
 import playSound from './playSound'
+import { getCurrentStage } from '@/store/getCurrentStage'
 
 export class GameStage {
   readonly app: PixiApp
@@ -57,11 +58,11 @@ export class GameStage {
       }
     })
 
-    // ゲーム状態の変更監視
+    // スコアの監視 → レベルアップ
     watch(
       () => store.state.game.scoreInLevel,
       async newScore => {
-        const level = levels[store.state.game.level] ?? levels[0]
+        const level = getCurrentStage()
         if (newScore >= level.scoreToClear) {
           // レベルアップ
           console.log('LEVEL UP: ' + (store.state.game.level + 1))
@@ -70,9 +71,19 @@ export class GameStage {
       }
     )
 
+    // ゲーム状態の監視
+    watch(
+      () => store.state.game.play,
+      async () => {
+        if (store.state.game.play === 'over') {
+          clearCats(this, true)
+        }
+      }
+    )
+
     // レベル変更の監視
     watch(
-      () => store.state.game.level,
+      () => [store.state.game.level, store.state.game.seq],
       async () => {
         this.reset()
       }
@@ -104,8 +115,7 @@ export class GameStage {
       await gsap.to(this.app, { cameraY: 1.1, cameraZoom: 2.5, duration: 2.5, ease: Cubic.easeOut })
     }
 
-    const levelNo = store.state.game.level
-    const level = isOpening ? openingLevel : levels[levelNo] ?? unknownLevel
+    const level = isOpening ? openingLevel : getCurrentStage()
 
     // レベル開始時の位置を常に同じにするため、たまさんの角度（=惑星上の位置）をゼロリセット
     this.tama.angle = 0

@@ -37,17 +37,18 @@ export class PixiApp extends PIXI.Application {
 
   constructor(canvas: HTMLCanvasElement) {
     const size = defineStageSize()
+    const resolution = Math.min(window.devicePixelRatio, 2)
     super({
       width: size.width,
       height: size.height,
       view: canvas,
       backgroundColor: 0xcccccc,
-      resolution: window.devicePixelRatio || 1,
-      antialias: window.devicePixelRatio <= 1,
+      resolution: resolution || 1,
+      antialias: resolution <= 1,
       autoDensity: true,
       transparent: true
     })
-    PIXI.settings.FILTER_RESOLUTION = window.devicePixelRatio || 1
+    PIXI.settings.FILTER_RESOLUTION = resolution || 1
 
     // ワールド = ステージ直下のスケール調整されたレイヤー
     const world = new PIXI.Container()

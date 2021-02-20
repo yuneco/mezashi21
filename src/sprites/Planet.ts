@@ -6,7 +6,6 @@ import { items } from '@/assets/PlanetItemDef'
 import { randomBetween, randomIntBetween } from '@/utils/MathUtil'
 import { createPlanetItem } from './planetItems/createPlanetItem'
 import { notNull } from '@/utils/ArrayUtil'
-import playSound from '@/logics/playSound'
 
 type PlanetItemName = keyof typeof items
 

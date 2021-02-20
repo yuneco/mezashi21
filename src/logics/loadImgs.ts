@@ -42,7 +42,7 @@ const resizeImgElem = (img: HTMLImageElement, w?: number, h?: number): void => {
 
 export const loadSvg = async (url: string, w?: number, h?: number): Promise<PIXI.Texture> => {
   const el = new Image(w, h)
-  const resolution = window.devicePixelRatio
+  const resolution = Math.min(window.devicePixelRatio, 2)
   const promise = new Promise<PIXI.Texture>((resolve, reject) => {
     el.addEventListener('load', () => {
       if (!w && !h) {

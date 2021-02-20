@@ -33,6 +33,6 @@ export const removeCat = async (stage: GameStage, cat: Cat, withMotion = true) =
   cat.parent.removeChild(cat)
 }
 
-export const clearCats = (stage: GameStage) => {
-  ;[...stage.cats].forEach(cat => removeCat(stage, cat))
+export const clearCats = (stage: GameStage, withMotion = false) => {
+  ;[...stage.cats].forEach(cat => removeCat(stage, cat, withMotion))
 }

@@ -1,6 +1,6 @@
 <template>
-  <div class="GameStageRoot">
-    <div class="debug">
+  <div class="GameStageRoot" :style="{ backgroundColor: state.mainColor }">
+    <div class="debug" v-show="debug.visible">
       <div class="info">
         STATE: {{ debug.playState }} LEVEL: {{ debug.level }} SCORE: {{ debug.score }}
         <button @click="newGame">RESTART</button>
@@ -12,6 +12,18 @@
       </div>
     </div>
     <canvas ref="canvas"></canvas>
+    <GameStageOverlay :clickable="state.overlayClickable">
+      <CenterMsg />
+      <TitleView v-show="state.titleVisible" @playNormal="playNormal" @playRandom="playRandom" />
+      <GameOverView
+        v-show="state.overVisible"
+        @back="backToTitle"
+        @replayNormal="playNormal"
+        @replayRandom="playRandom"
+      />
+      <GameStatusView v-show="state.statusVisible" />
+      <CatGage v-show="state.statusVisible" />
+    </GameStageOverlay>
   </div>
 </template>
 
@@ -20,19 +32,43 @@ import { defineComponent, ref, onMounted, reactive, computed } from 'vue'
 import { GameStage as GameStageClass } from '@/logics/GameStage'
 import { useStore } from 'vuex'
 import { State as StoreState } from '@/store'
+import { num2cssColor } from '@/utils/colorUtil'
 import playSound from '@/logics/playSound'
+import CenterMsg from './CenterMsg.vue'
+import GameStageOverlay from './GameStageOverlay.vue'
+import TitleView from './TitleView.vue'
+import GameOverView from './GameOverView.vue'
+import GameStatusView from './GameStatusView.vue'
+import CatGage from './CatGage.vue'
 
 export default defineComponent({
   name: 'GameStage',
+  components: {
+    GameStageOverlay,
+    CenterMsg,
+    TitleView,
+    GameOverView,
+    GameStatusView,
+    CatGage
+  },
   setup() {
     const store = useStore<StoreState>()
     const debug = reactive({
+      visible: false,
       level: computed(() => store.state.game.level),
       score: computed(() => store.state.game.score),
       playState: computed(() => store.state.game.play),
       startLevel: 15
     })
-
+    const state = reactive({
+      titleVisible: computed(() => store.state.game.play === 'opening'),
+      overVisible: computed(() => store.state.game.play === 'over'),
+      statusVisible: computed(() => store.state.game.play === 'playing'),
+      overlayClickable: computed(
+        () => store.state.game.play === 'opening' || store.state.game.play === 'over'
+      ),
+      mainColor: computed(() => num2cssColor(store.state.appcolor.border))
+    })
     let game: GameStageClass | undefined = undefined
     const canvas = ref<HTMLCanvasElement>()
 
@@ -49,7 +85,18 @@ export default defineComponent({
     const newGame = async () => {
       store.commit('setInitialTap')
       playSound('btn')
-      store.dispatch('newGame', { level: debug.startLevel || 0 })
+      store.commit('setGameStartLevel', { level: debug.startLevel })
+      store.dispatch('newGame')
+    }
+
+    const playNormal = () => {
+      store.commit('setGameIsRandomLevel', { isRandom: false })
+      store.dispatch('newGame')
+    }
+
+    const playRandom = () => {
+      store.commit('setGameIsRandomLevel', { isRandom: true })
+      store.dispatch('newGame')
     }
 
     const prevLevel = () => {
@@ -69,14 +116,22 @@ export default defineComponent({
         : 'RELOADING...'
     })
 
+    const backToTitle = () => {
+      store.dispatch('gameTop')
+    }
+
     onMounted(initGame)
     return {
+      state,
       debug,
       canvas,
       newGame,
       prevLevel,
       nextLevel,
-      balletCountStr
+      balletCountStr,
+      playNormal,
+      playRandom,
+      backToTitle
     }
   }
 })
@@ -88,12 +143,11 @@ export default defineComponent({
   display: flex;
   height: 100%;
   canvas {
-    box-sizing: border-box;
-    border: 1px solid gray;
     margin: auto;
   }
   .debug {
     position: absolute;
+    z-index: 9999;
   }
 }
 </style>

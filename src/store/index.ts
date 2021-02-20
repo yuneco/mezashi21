@@ -1,4 +1,8 @@
+import { levels } from '@/assets/GameLevelDef'
+import { randomIntBetween } from '@/utils/MathUtil'
 import { createStore } from 'vuex'
+
+const maxLevel = levels.length - 1
 
 type Direction = 'left' | 'right'
 type PlayStatus = 'opening' | 'playing' | 'transition' | 'over'
@@ -24,8 +28,11 @@ type TamaState = {
 
 type GameState = {
   seq: number
+  startLevel: number
+  isRandomLevel: boolean
   play: PlayStatus
   level: number
+  levelStage: number
   score: number
   scoreInLevel: number
   balletCount: BalletCount
@@ -62,8 +69,11 @@ export default createStore<State>({
     },
     game: {
       seq: 0,
+      startLevel: 0,
+      isRandomLevel: false,
       play: 'opening',
       level: -1,
+      levelStage: -1,
       score: 0,
       scoreInLevel: 0,
       balletCount: 6,
@@ -98,9 +108,10 @@ export default createStore<State>({
       state.game.score = payload.score
       state.game.scoreInLevel = payload.scoreInLevel
     },
-    setGameLevel(state, payload: { level: number }) {
+    setGameLevel(state, payload: { level: number; stageLevel?: number }) {
       state.game.level = payload.level
       state.game.scoreInLevel = 0
+      state.game.levelStage = payload.stageLevel ?? payload.level
     },
     setGameSeq(state, payload: { seq: number }) {
       state.game.seq = payload.seq
@@ -119,16 +130,27 @@ export default createStore<State>({
     },
     setInitialTap(state) {
       state.system.initialTapped = true
+    },
+    setGameStartLevel(state, payload: { level: number }) {
+      state.game.startLevel = payload.level
+    },
+    setGameIsRandomLevel(state, payload: { isRandom: boolean }) {
+      state.game.isRandomLevel = payload.isRandom
     }
   },
   actions: {
     gameOver(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'over' })
     },
-    newGame(ctx, payload?: { level?: number }) {
+    gameTop(ctx) {
+      ctx.commit('setGamePlayStatus', { playStatus: 'opening' })
+    },
+    newGame(ctx) {
       ctx.commit('setGameSeq', { seq: ctx.state.game.seq + 1 })
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
-      ctx.commit('setGameLevel', { level: payload?.level ?? 0 })
+      const isRandom = ctx.state.game.isRandomLevel
+      const stageLevel = isRandom ? randomIntBetween(0, maxLevel) : ctx.state.game.startLevel
+      ctx.commit('setGameLevel', { level: ctx.state.game.startLevel, stageLevel })
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
       ctx.commit('setTamaDirection', { dir: 'right' })
       ctx.commit('setGameScore', {
@@ -158,7 +180,11 @@ export default createStore<State>({
     },
     gameLevelUp(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'transition' })
-      ctx.commit('setGameLevel', { level: ctx.state.game.level + 1 })
+      const level = ctx.state.game.level + 1
+      const isRandom = ctx.state.game.isRandomLevel || level > maxLevel
+      const stageLevel = isRandom ? randomIntBetween(0, maxLevel) : level
+      ctx.commit('setGameLevel', { level, stageLevel })
+      console.log('Up', stageLevel, ctx.state.game.levelStage)
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
     },
     gameLevelChange(ctx, payload: { level: number }) {
