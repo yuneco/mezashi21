@@ -6,7 +6,7 @@ const shaderSource = require('./PaperFilter.glsl').default as string
  */
 export default class PastelFilter extends PIXI.Filter {
   constructor(scale = 0.8, applyAlpha = false, alphaLow = 0.23, alphaHigh = 0.4) {
-    const paper = PIXI.Texture.from('/imgs/paperNoise.png')
+    const paper = PIXI.Texture.from('/imgs/paperNoise.jpg')
 
     super(
       undefined, // 頂点シェーダーのソース（今回はいらないのでnull）

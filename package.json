@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "svgo": "svgo -r -f public/imgs.org -o public/imgs"
   },
   "dependencies": {
     "@pixi/filter-adjustment": "^3.1.1",
@@ -44,6 +45,7 @@
     "raw-loader": "^4.0.2",
     "sass": "^1.26.5",
     "sass-loader": "^8.0.2",
+    "svgo": "^2.0.2",
     "typescript": "~3.9.3"
   }
 }

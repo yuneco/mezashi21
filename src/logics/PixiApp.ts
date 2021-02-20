@@ -131,7 +131,7 @@ export class PixiApp extends PIXI.Application {
     if (filterType === 'water') {
       const tex = new PIXI.Sprite(
         await loadSvg(
-          '/imgs/paperNoise2.png',
+          '/imgs/paperNoise2.jpg',
           store.state.stageSetting.width,
           store.state.stageSetting.height
         )

@@ -9,7 +9,7 @@ export default class PastelFilter extends PIXI.Filter {
   thickness: number
 
   constructor(thickness = 4.0) {
-    const paper = PIXI.Texture.from('/imgs/paperNoise.png')
+    const paper = PIXI.Texture.from('/imgs/paperNoise.jpg')
     super(
       undefined, // 頂点シェーダーのソース（今回はいらないのでnull）
       // フラグメントシェーダーのソース：
