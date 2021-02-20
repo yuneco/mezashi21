@@ -1,9 +1,13 @@
 import { createStore } from 'vuex'
 
 type Direction = 'left' | 'right'
-type PlayStatus = 'playing' | 'transition' | 'over'
+type PlayStatus = 'opening' | 'playing' | 'transition' | 'over'
 type TamaJumpCount = 0 | 1 | 2 | 3
 type BalletCount = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+type SystemState = {
+  initialTapped: boolean
+}
 
 type StageSetting = {
   width: number
@@ -33,6 +37,7 @@ type AppColor = {
 }
 
 export type State = {
+  system: SystemState
   stageSetting: StageSetting
   tama: TamaState
   game: GameState
@@ -41,6 +46,9 @@ export type State = {
 
 export default createStore<State>({
   state: {
+    system: {
+      initialTapped: false
+    },
     stageSetting: {
       width: 0,
       height: 0,
@@ -54,8 +62,8 @@ export default createStore<State>({
     },
     game: {
       seq: 0,
-      play: 'playing',
-      level: 0,
+      play: 'opening',
+      level: -1,
       score: 0,
       scoreInLevel: 0,
       balletCount: 6,
@@ -108,16 +116,19 @@ export default createStore<State>({
           state.appcolor[key as keyof AppColor] = val
         }
       })
+    },
+    setInitialTap(state) {
+      state.system.initialTapped = true
     }
   },
   actions: {
     gameOver(ctx) {
       ctx.commit('setGamePlayStatus', { playStatus: 'over' })
     },
-    newGame(ctx) {
+    newGame(ctx, payload?: { level?: number }) {
       ctx.commit('setGameSeq', { seq: ctx.state.game.seq + 1 })
       ctx.commit('setGamePlayStatus', { playStatus: 'playing' })
-      ctx.commit('setGameLevel', { level: 0 })
+      ctx.commit('setGameLevel', { level: payload?.level ?? 0 })
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
       ctx.commit('setTamaDirection', { dir: 'right' })
       ctx.commit('setGameScore', {

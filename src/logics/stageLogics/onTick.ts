@@ -8,7 +8,7 @@ import { Satellite } from '@/sprites/Satellite'
 import playSound, { repeatSound } from '../playSound'
 
 let lastApproachTime = 0
-const APPLOACH_SND_MIN_INTERVAL = 500
+const APPLOACH_SND_MIN_INTERVAL = 200
 
 const indecatorAngleForOrbit = (orbit: number) => {
   const width = store.state.stageSetting.vw
@@ -95,11 +95,11 @@ export const updateTamaPos = (tama: Tama) => {
     const tamaDir = store.state.tama.dir
     const isJumping = store.state.tama.jumpCount > 0
     if (tamaDir == 'right') {
-      tama.angle += isJumping ? 0.3 : 0.1
+      tama.angle += isJumping ? 0.2 : 0.1
       tama.scale.x = 1
     }
     if (tamaDir == 'left') {
-      tama.angle -= isJumping ? 0.3 : 0.1
+      tama.angle -= isJumping ? 0.2 : 0.1
       tama.scale.x = -1
     }
   }
@@ -120,8 +120,11 @@ export const updateSatIndicator = (sat: Satellite, tamaAngle: number) => {
     ? baseAngle + IndicatorAngle * (sat.isClockwise ? -1 : 1)
     : undefined
   if (isApproaching) {
+    // 接近時に警報音を鳴らす。一度鳴らしたら一定時間は鳴らさない
     const now = Date.now()
-    if (now - lastApproachTime > APPLOACH_SND_MIN_INTERVAL) {
+    const shouldPlaySnd =
+      now - lastApproachTime > APPLOACH_SND_MIN_INTERVAL && store.state.game.play === 'playing'
+    if (shouldPlaySnd) {
       repeatSound('warn', 3)
     }
     lastApproachTime = now

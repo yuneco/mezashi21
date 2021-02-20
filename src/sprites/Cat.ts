@@ -161,8 +161,8 @@ export class Cat extends StyledContainer {
 
     if (this.jumpHeight) {
       run(async () => {
-        await animate(cont, { y: -1000 }, DUR / 2)
-        await animate(cont, { y: 0 }, DUR / 2)
+        await animate(cont, { y: -this.jumpHeight }, DUR / 2, Cubic.easeOut)
+        await animate(cont, { y: 0 }, DUR / 2, Cubic.easeIn)
       })
     }
 

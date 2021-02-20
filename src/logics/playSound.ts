@@ -1,25 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import store from '@/store'
 import loadSnd from 'audio-loader'
 import playSnd from 'audio-play'
 
-type SndName =
-  | 'btn'
-  | 'catch'
-  | 'jump'
-  | 'gameover'
-  | 'shot'
-  | 'charge'
-  | 'down'
-  | 'lvup'
-  | 'miss'
-  | 'warn'
+type SndName = 'btn' | 'catch' | 'jump' | 'gameover' | 'shot' | 'down' | 'lvup' | 'miss' | 'warn'
 const sndNames: SndName[] = [
   'btn',
   'catch',
   'jump',
   'gameover',
   'shot',
-  'charge',
   'down',
   'lvup',
   'miss',
@@ -34,7 +24,14 @@ const load = (name: SndName) => {
 }
 sndNames.forEach(name => load(name))
 
+const isPlayAllowed = () => {
+  return store.state.system.initialTapped
+}
+
 const playSound = (name: SndName) => {
+  if (!isPlayAllowed()) {
+    return
+  }
   const audio = snds[name]
   if (!audio) {
     // console.warn(`No sound for: ${name}`)
@@ -46,6 +43,9 @@ const playSound = (name: SndName) => {
 }
 
 export const repeatSound = (name: SndName, times: number) => {
+  if (!isPlayAllowed()) {
+    return
+  }
   const audio = snds[name]
   if (!audio || times <= 0) {
     // console.warn(`No sound for: ${name}`)

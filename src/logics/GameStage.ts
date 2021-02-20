@@ -19,7 +19,7 @@ import {
 import { AutoCatMaker } from './stageLogics/AutoCatMaker'
 import { changePlanet } from './stageLogics/planetLogics'
 import { addSatellite, clearSatellites } from './stageLogics/satelliteLogics'
-import { levels } from '@/assets/GameLevelDef'
+import { levels, openingLevel, unknownLevel } from '@/assets/GameLevelDef'
 import { watch } from 'vue'
 import gsap, { Cubic } from 'gsap'
 import { sleep } from '@/utils/sleep'
@@ -98,13 +98,14 @@ export class GameStage {
     clearMezashis(this)
 
     const isLevelupTransition = store.state.game.play === 'transition'
+    const isOpening = store.state.game.play === 'opening'
     if (isLevelupTransition) {
       playSound('lvup')
       await gsap.to(this.app, { cameraY: 1.1, cameraZoom: 2.5, duration: 2.5, ease: Cubic.easeOut })
     }
 
     const levelNo = store.state.game.level
-    const level = levels[levelNo] || levels[0]
+    const level = isOpening ? openingLevel : levels[levelNo] ?? unknownLevel
 
     // レベル開始時の位置を常に同じにするため、たまさんの角度（=惑星上の位置）をゼロリセット
     this.tama.angle = 0
@@ -169,7 +170,9 @@ export class GameStage {
     }
     const local = this.app.global2Camera(ev.data.global)
     // めざし発射
-    const isFireable = store.state.game.balletCount > 0
+    const isFireable =
+      store.state.game.balletCount > 0 &&
+      (store.state.game.play === 'playing' || store.state.game.play === 'transition')
     if (isFireable) {
       playSound('shot')
       store.dispatch('gameFireBallet')

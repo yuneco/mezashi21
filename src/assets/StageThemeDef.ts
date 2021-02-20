@@ -75,7 +75,7 @@ export const univ: StageTheme = {
   name: 'Universe',
   imgDir: '/imgs/bg/univ',
   colors: {
-    border: 0x25221c
+    border: 0x4b4839
   },
   preloads: [
     'UnivSky.svg',

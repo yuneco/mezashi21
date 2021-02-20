@@ -3,23 +3,19 @@ import { Cat } from '@/sprites/Cat'
 import { GameStage } from '../GameStage'
 import { setOnPlanet } from './setOnPlanet'
 import store from '@/store'
-import { levels } from '@/assets/GameLevelDef'
+import { levels, unknownLevel } from '@/assets/GameLevelDef'
 import { randomBetween } from '@/utils/MathUtil'
-
-const randomBased = (base: number, lowerTimes: number, upperTimes: number): number => {
-  return base * (lowerTimes + (upperTimes - lowerTimes) * Math.random())
-}
 
 export const addCat = async (stage: GameStage) => {
   const cat = new Cat()
   await cat.load()
 
   const levelNo = store.state.game.level
-  const level = levels[levelNo] ?? levels[0]
+  const level = levels[levelNo] ?? unknownLevel
 
-  const catSpeed = randomBased(level.maxCatSpeed, 0.5, 1)
-  const jumpHeight =
-    level.maxCatJump > 0 && Math.random() > 0.5 ? randomBased(level.maxCatJump, 0.5, 1) : 0
+  const catSpeed = level.maxCatSpeed * randomBetween(0.6, 1)
+  const shouldJump = level.maxCatJump > 0 && Math.random() > 0.5
+  const jumpHeight = shouldJump ? level.maxCatJump * randomBetween(0.4, 1) : 0
 
   stage.cats.push(cat)
   const isDirRight = Math.random() > 0.5

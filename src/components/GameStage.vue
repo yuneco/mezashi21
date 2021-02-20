@@ -2,11 +2,13 @@
   <div class="GameStageRoot">
     <div class="debug">
       <div class="info">
-        LEVEL: {{ debug.level }} SCORE: {{ debug.score }} <button @click="newGame">RESTART</button>
+        STATE: {{ debug.playState }} LEVEL: {{ debug.level }} SCORE: {{ debug.score }}
+        <button @click="newGame">RESTART</button>
         <span class="ballets">{{ balletCountStr }}</span>
         <br />
         <button @click="prevLevel">◀︎ Prev Lv</button>
         <button @click="nextLevel">Next Lv ▶︎</button>
+        START Lv: <input type="text" v-model.number="debug.startLevel" />
       </div>
     </div>
     <canvas ref="canvas"></canvas>
@@ -26,24 +28,28 @@ export default defineComponent({
     const store = useStore<StoreState>()
     const debug = reactive({
       level: computed(() => store.state.game.level),
-      score: computed(() => store.state.game.score)
+      score: computed(() => store.state.game.score),
+      playState: computed(() => store.state.game.play),
+      startLevel: 15
     })
 
     let game: GameStageClass | undefined = undefined
     const canvas = ref<HTMLCanvasElement>()
 
-    const newGame = async () => {
+    const initGame = async () => {
       playSound('btn')
       const canvasEl = canvas.value
-      if (canvasEl) {
-        store.dispatch('newGame')
-        if (game) {
-          game.reset()
-        } else {
-          game = new GameStageClass(canvasEl)
-          await game.load()
-        }
+      if (!canvasEl) {
+        return
       }
+      game = new GameStageClass(canvasEl)
+      await game.load()
+    }
+
+    const newGame = async () => {
+      store.commit('setInitialTap')
+      playSound('btn')
+      store.dispatch('newGame', { level: debug.startLevel || 0 })
     }
 
     const prevLevel = () => {
@@ -63,7 +69,7 @@ export default defineComponent({
         : 'RELOADING...'
     })
 
-    onMounted(newGame)
+    onMounted(initGame)
     return {
       debug,
       canvas,

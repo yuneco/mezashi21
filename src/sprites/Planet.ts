@@ -77,12 +77,6 @@ export class Planet extends PIXI.Container {
       const dist = Math.hypot(pos.x, pos.y)
       if (dist < (planetBodySprite.width / 2) * (1 - SAFE_MARGIN)) {
         ev.stopPropagation()
-        const currentCount = store.state.tama.jumpCount
-        if (currentCount <= 1) {
-          playSound('jump')
-        } else if (currentCount == 2) {
-          playSound('down')
-        }
         store.dispatch('tamaJump')
       }
     })

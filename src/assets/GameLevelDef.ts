@@ -1,45 +1,47 @@
+import { randomFrom } from '@/utils/ArrayUtil'
 import { GameLevel } from './GameLevel'
+import { cloudSkyStage } from './levels/cloudSkyStage'
+import { duskSkyStage } from './levels/duskSkyStage'
+import { nightSkyStage } from './levels/nightSkyStage'
+import { snowSkyStage } from './levels/snowSkyStage'
+import { univSkyStage } from './levels/univSkyStage'
+import { waterSkyStage } from './levels/waterSkyStage'
+
+export const openingLevel: GameLevel = {
+  themeName: 'sky',
+  planetSize: 500,
+  planetImgName: 'Planet3',
+  planetItem: 'redFlower',
+  scoreToClear: 1,
+  maxCatSpeed: 0.3,
+  maxCatJump: 10,
+  catBornInterval: 3,
+  satellaites: [
+    {
+      size: 100,
+      imgName: 'Planet2',
+      orbitSize: 700,
+      orbitDuration: 8,
+      initialAngle: 30
+    },
+    {
+      size: 60,
+      imgName: 'Planet4',
+      orbitSize: 1200,
+      orbitDuration: -12,
+      initialAngle: 30
+    }
+  ]
+}
 
 export const levels: GameLevel[] = [
-  // Lv1
-  {
-    themeName: 'sky',
-    planetSize: 500,
-    planetImgName: 'Planet1',
-    planetItem: 'redFlower',
-    scoreToClear: 5,
-    maxCatSpeed: 0.2,
-    maxCatJump: 0,
-    catBornInterval: 3,
-    satellaites: []
-  },
-  {
-    themeName: 'sky',
-    planetSize: 800,
-    planetImgName: 'Planet3',
-    planetItem: 'redFlower',
-    scoreToClear: 5,
-    maxCatSpeed: 0.25,
-    maxCatJump: 20,
-    catBornInterval: 3,
-    satellaites: []
-  },
-  {
-    themeName: 'sky',
-    planetSize: 1000,
-    planetImgName: 'Planet6',
-    scoreToClear: 5,
-    maxCatSpeed: 0.28,
-    maxCatJump: 100,
-    catBornInterval: 2.8,
-    satellaites: [
-      {
-        size: 60,
-        imgName: 'Planet3',
-        orbitSize: 1500,
-        orbitDuration: -12,
-        initialAngle: 30
-      }
-    ]
-  }
+  // Lv1 - 5: CloudSky Stage
+  ...cloudSkyStage,
+  ...nightSkyStage,
+  ...snowSkyStage,
+  ...waterSkyStage,
+  ...duskSkyStage,
+  ...univSkyStage
 ]
+
+export const unknownLevel = randomFrom(levels)

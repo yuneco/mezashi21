@@ -7,6 +7,7 @@ import { SpriteDef, loadSprites } from '@/logics/loadSprites'
 import { StyledContainer } from './StyledContainer'
 import { computed, reactive, watch } from 'vue'
 import store from '@/store'
+import playSound from '@/logics/playSound'
 
 const tamaDefs: SpriteDef[] = [
   {
@@ -52,7 +53,7 @@ const tamaDefs: SpriteDef[] = [
 ]
 
 /** モーションの種類 */
-type TamaMotion = 'step' | 'jump' | 'down' | 'over' | 'levelup' | 'none'
+type TamaMotion = 'step' | 'jump' | 'dbljump' | 'down' | 'over' | 'levelup' | 'none'
 /** たまさんの状態 */
 type State = {
   /** モーションの通番。nextMotionで使用されます */
@@ -107,19 +108,33 @@ export class Tama extends StyledContainer {
       () => store.state.tama.jumpCount,
       async (newVal, oldVal) => {
         if (oldVal === 0 && newVal === 1) {
+          playSound('jump')
           await this.jumpMotion()
         }
+        if (oldVal === 1 && newVal === 2) {
+          const DBLJUMP_MIN_Y = 50 // 二段ジャンプ発動に必要な最低高
+          const tamaY = -this.chara.y
+          if (tamaY > DBLJUMP_MIN_Y) {
+            playSound('jump')
+            await this.dblJumpMotion()
+          }
+        }
         if (oldVal === 2 && newVal === 3) {
-          await this.downMotion()
+          const DOWN_MIN_Y = 250 // 強制着地発動に必要な最低高
+          const tamaY = -this.chara.y
+          if (tamaY > DOWN_MIN_Y) {
+            playSound('down')
+            await this.downMotion()
+          }
         }
       }
     )
 
-    // レベルアップの監視
+    // レベルアップトランジションの監視
     watch(
-      () => store.state.game.level,
-      newLv => {
-        if (newLv != 0) {
+      () => store.state.game.play,
+      playSt => {
+        if (playSt === 'transition') {
           // レベルアップモーション
           console.log('levelup motion')
           this.levelUpMotion()
@@ -154,7 +169,7 @@ export class Tama extends StyledContainer {
    * 状態に合わせて適切なデフォルトモーションを実行します
    */
   private defaultMotion() {
-    if (store.state.game.play === 'playing') {
+    if (store.state.game.play === 'playing' || store.state.game.play === 'opening') {
       this.stepMotion()
       return
     }
@@ -234,30 +249,62 @@ export class Tama extends StyledContainer {
     // 予備動作
     await all(
       mo.animate(cont, { scaleY: 0.75, angle: 15 }, 0.15, Sine.easeOut),
-      mo.animate(amFr, { angle: -40 }, 0.35),
-      mo.animate(amBk, { angle: -30 }, 0.3),
-      mo.animate(lgBk, { angle: 0 }, 0.3),
-      mo.animate(lgFr, { angle: 0 }, 0.3)
+      mo.animate(amFr, { angle: -40 }, 0.15),
+      mo.animate(amBk, { angle: -30 }, 0.15),
+      mo.animate(lgBk, { angle: 0 }, 0.15),
+      mo.animate(lgFr, { angle: 0 }, 0.15)
     )
     await all(
       // 本体ジャンプ
       run(async () => {
         await mo.animate(cont, { scaleY: 1.1, y: -1000 }, 1.6, Cubic.easeOut)
-        // このタイミングまでに2回タップされていたら二段ジャンプ
-        const isDouble = store.state.tama.jumpCount >= 2
-        if (isDouble) {
-          mo.animate(cont, { scaleY: 0.8 }, 0.5, Back.easeOut)
-          await all(
-            mo.animate(cont, { y: -1600 }, 0.9, Cubic.easeOut),
-            mo.animate(cont, { angle: -360 }, 1.8, Back.easeOut)
-          )
-        }
-        if (isDouble) {
-          await mo.animate(cont, { scaleY: 1.0, y: 0 }, 3.5, Bounce.easeOut)
-          mo.set(cont, { angle: 0 })
-        } else {
-          await mo.animate(cont, { scaleY: 1.0, y: 0, angle: 0 }, 2.5, Bounce.easeOut)
-        }
+        await mo.animate(cont, { scaleY: 1.0, y: 0, angle: 0 }, 2.5, Bounce.easeOut)
+      }),
+      // 腕振り手前
+      run(async () => {
+        await mo.animate(amFr, { angle: 50 }, 1.3)
+        await mo.animate(amFr, { angle: 0 }, 1.0)
+      }),
+      // 腕振り奥
+      run(async () => {
+        await mo.animate(amBk, { angle: 30 }, 1.3)
+        await mo.animate(amBk, { angle: 0 }, 1.0)
+      }),
+      // 足振り
+      run(async () => {
+        await mo.animate(lgBk, { angle: -30 }, 1.2)
+        await mo.animate(lgBk, { angle: 0 }, 0.9)
+      })
+    )
+
+    store.dispatch('tamaJumpEnd')
+    mo.alive && this.defaultMotion()
+  }
+
+  private async dblJumpMotion() {
+    const cont = this.chara // 本体
+    const amFr = cont?.getChildByName('AmFr') // 腕手前
+    const amBk = cont?.getChildByName('AmBk') // 腕奥
+    const lgFr = cont?.getChildByName('LgFr') // 足手前
+    const lgBk = cont?.getChildByName('LgBk') // 足奥
+    if (!amFr || !amBk || !lgBk || !lgFr) {
+      return
+    }
+
+    const mo = this.nextMotion('dbljump')
+
+    const startY = cont.y
+    const downDur = 1.5 + -startY / 600
+    await all(
+      // 本体ジャンプ
+      run(async () => {
+        mo.animate(cont, { scaleY: 0.8 }, 0.5, Back.easeOut)
+        await all(
+          mo.animate(cont, { y: startY - 800 }, 0.9, Cubic.easeOut),
+          mo.animate(cont, { angle: -360 }, 1.8, Back.easeOut)
+        )
+        await mo.animate(cont, { scaleY: 1.0, y: 0 }, downDur, Bounce.easeOut)
+        mo.set(cont, { angle: 0 })
       }),
       // 腕振り手前
       run(async () => {
@@ -328,7 +375,6 @@ export class Tama extends StyledContainer {
 
   private async levelUpMotion() {
     const cont = this.chara // 本体
-
     const mo = this.nextMotion('levelup')
 
     // 予備動作
