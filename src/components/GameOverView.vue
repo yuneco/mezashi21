@@ -17,9 +17,13 @@
         <input type="text" placeholder="なまえをいれてね" v-model="state.name" />
         <button @click="registerScore">OK</button>
       </div>
-      <div class="buttons fulful">
+      <div class="buttons fulful" v-show="!state.showRankRegister">
         <button @click="back">TOP</button>
         <button @click="replay">Replay</button>
+        <button @click="tweet">Tweet</button>
+        <div class="tweeninfo">
+          ぜひTwitterでの拡散をお願いします
+        </div>
       </div>
     </div>
   </div>
@@ -44,7 +48,8 @@ export default defineComponent({
     const state = reactive({
       name: '',
       showRankRegister: false,
-      rank: -1
+      rank: -1,
+      backToRanking: false
     })
 
     watch(
@@ -54,11 +59,11 @@ export default defineComponent({
         const rank = await DocApi.getRank(score.value, 10, true)
         state.rank = rank
         state.showRankRegister = rank !== -1
+        state.backToRanking = false
       }
     )
 
-    const sendResult = async (wishToAddRanking: boolean) => {
-      if (store.state.game.play !== 'over') return
+    const createResultItem = () => {
       const uid = AuthApi.uid
       if (!uid) {
         return
@@ -68,27 +73,53 @@ export default defineComponent({
       const mode = store.state.game.isRandomLevel ? 'random' : 'normal'
       const name = state.name
       const item = new RankingItem(uid, name, score, lv, mode)
-      if (wishToAddRanking) {
-        await DocApi.addRanking(item)
-      }
-      DocApi.pushPlaylog(item)
+      return item
     }
 
-    const registerScore = () => {
+    const sendRanking = async () => {
+      const item = createResultItem()
+      if (!item) return
+      await DocApi.addRanking(item)
+    }
+    const sendPlaylog = async () => {
+      const item = createResultItem()
+      if (!item) return
+      await DocApi.pushPlaylog(item)
+    }
+
+    const registerScore = async () => {
       playSound('btn')
-      sendResult(true)
-      ctx.emit('ranking')
+      if (state.name) {
+        // 名前を入れていない時はランキングに登録しない
+        await sendRanking()
+      }
+      state.showRankRegister = false
+      state.backToRanking = true
     }
     const replay = () => {
       playSound('btn')
       const isRandomMode = store.state.game.isRandomLevel
-      sendResult(false)
+      sendPlaylog()
       ctx.emit(isRandomMode ? 'replayRandom' : 'replayNormal')
     }
     const back = () => {
       playSound('btn')
-      sendResult(false)
-      ctx.emit('back')
+      sendPlaylog()
+      ctx.emit(state.backToRanking ? 'ranking' : 'back')
+    }
+
+    const tweet = () => {
+      playSound('btn')
+      const text = encodeURIComponent(
+        `ネコメザシアタック21で${score.value}匹の猫にメザシをあげたよ！`
+      )
+      const pageUrl = `https://nekomzs21.web.app/`
+      const pop = window.open('', 'nekotweet')
+      if (pop) {
+        pop.document.body.innerHTML = 'loading...'
+      }
+      const twurl = `https://twitter.com/share?text=${text}&url=${pageUrl}&hashtags=MezashiAttack`
+      window.open(twurl, 'nekotweet')
     }
 
     return {
@@ -96,6 +127,7 @@ export default defineComponent({
       score,
       replay,
       back,
+      tweet,
       registerScore
     }
   }
@@ -109,6 +141,7 @@ export default defineComponent({
   height: 80%;
   left: 10%;
   top: 20%;
+  user-select: none;
   animation: slide 2s ease-in-out 1.5s 1 both;
   display: grid;
   row-gap: 3vh;
@@ -149,9 +182,15 @@ export default defineComponent({
     text-align: center;
     .rankin {
       padding-bottom: 3vh;
-      input {
-        height: 2em;
+      .rankinMsg {
+        font-size: min(4vw, 3vh);
       }
+      input {
+        font-size: min(4vw, 3vh);
+      }
+    }
+    .tweeninfo {
+      font-size: min(3vw, 2.5vh);
     }
   }
 }

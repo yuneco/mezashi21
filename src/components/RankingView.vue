@@ -103,6 +103,7 @@ export default defineComponent({
       font-weight: bold;
       display: flex;
       width: 100%;
+      font-size: min(3vw, 2vh);
       &.header {
         border-bottom: 1px solid currentColor;
       }

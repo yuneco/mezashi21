@@ -96,7 +96,7 @@ export class GameStage {
         if (newVal !== 0) {
           return
         }
-        const TIME_TO_RELOAD = 1500
+        const TIME_TO_RELOAD = 2150
         await sleep(TIME_TO_RELOAD) // 所定時間待ってから
         store.dispatch('gameReloadBallet') // リロード
       }

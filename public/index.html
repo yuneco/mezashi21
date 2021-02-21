@@ -1,17 +1,68 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="Description" content="ネコメザシアタックは猫にメザシをあたえるだけの超ゆるかわなフリーのブラウザゲームです">
+  <meta property="og:title" content="ネコ🐱メザシ🐟アタック🌟21">
+  <meta property="og:image" content="https://nekomzs21.web.app/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:description" content="猫にメザシをあたえるだけの超ゆるかわなフリーのブラウザゲームです">
+  <meta property="og:url" content="https://nekomzs21.web.app/">
+  <meta property="og:site_name" content="ネコ🐱メザシ🐟アタック🌟21">
+  <meta property="og:type" content="website">
+  <meta name="twitter:site" content="https://nekomzs21.web.app/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ネコ🐱メザシ🐟アタック🌟21">
+  <meta name="twitter:image" content="https://nekomzs21.web.app/ogp.png">
+  <meta name="twitter:description" content="猫にメザシをあたえるだけの超ゆるかわなフリーのブラウザゲームです">
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>ネコメザシアタック21 - Neko Mezashi Attack21 - 猫にメザシをあたえるゆるかわゲーム</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'ヒラギノ丸ゴ Pro W4', 'ヒラギノ丸ゴ Pro', 'Hiragino Maru Gothic Pro',
+        'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'HG丸ｺﾞｼｯｸM-PRO', 'HGMaruGothicMPRO';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    #app-splash {
+      position: absolute;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      background-color: #91CCC1 ;
+      color: #4f7884;
+      text-align: center;
+      padding: 20%;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong>
+  </noscript>
+  <div id="app-splash">
+    <h1>Neko Mezashi Attack21</h1>
+    <div class="msg">loading...</div>
+  </div>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
 </html>

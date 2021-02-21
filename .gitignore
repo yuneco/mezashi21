@@ -21,3 +21,11 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+### Firebase ###
+**/node_modules/*
+**/.firebaserc
+
+### Firebase Patch ###
+.runtimeconfig.json
+.firebase/

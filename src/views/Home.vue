@@ -56,6 +56,7 @@ export default defineComponent({
 .home {
   position: inherit;
   height: 100%;
+  width: 100%;
 }
 </style>
 
