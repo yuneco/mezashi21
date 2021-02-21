@@ -2,9 +2,13 @@ import { levels } from '@/assets/GameLevelDef'
 import store from '.'
 
 export const getCurrentStage = () => {
-  const levelDef = levels[store.state.game.levelStage]
+  const stageNo = store.state.game.levelStage
+  if (stageNo < 0) {
+    return levels[0]
+  }
+  const levelDef = levels[stageNo]
   if (!levelDef) {
-    console.warn('Invalid stage level state', store.state.game.levelStage)
+    console.warn('Invalid stage level state', stageNo)
     return levels[0]
   }
   return levelDef

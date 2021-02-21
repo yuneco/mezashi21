@@ -1,5 +1,3 @@
-import * as PIXI from 'pixi.js'
-import { loadSvg } from '@/logics/loadImgs'
 import { FilterOptionParam } from '@/sprites/StyledContainer'
 import { randomFrom } from '@/utils/ArrayUtil'
 import { items } from '@/assets/PlanetItemDef'
@@ -12,9 +10,7 @@ export class Ice extends PlanetItemBase {
 
   async load() {
     const def = items.ice
-    const spIce = new PIXI.Sprite(
-      await loadSvg(`${def.imgDir}/Ice${randomFrom([1, 2, 3])}.svg`, this.size)
-    )
+    const spIce = await this.loadItem(`${def.imgDir}/Ice${randomFrom([1, 2, 3])}.svg`, this.size)
     spIce.anchor.set(0.5, 1)
     spIce.y = this.size * 0.12
 

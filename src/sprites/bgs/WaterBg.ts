@@ -17,7 +17,7 @@ export class WaterBg extends StageBackground {
    */
   async load() {
     const def = themes.water
-    this.addChild(await loadSprite(`${def.imgDir}/WaterBg.svg`, this.area.width, this.area.height))
+    await this.loadBg(`${def.imgDir}/WaterBg.svg`)
     const wave1 = await loadSprite(`${def.imgDir}/Wave1.svg`, this.area.width)
     const wave2 = await loadSprite(`${def.imgDir}/Wave2.svg`, this.area.width)
     const wave3 = await loadSprite(`${def.imgDir}/Wave3.svg`, this.area.width)

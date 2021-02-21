@@ -1,4 +1,4 @@
-import { loadSprite, loadSvgs } from '@/logics/loadImgs'
+import { loadSvgs } from '@/logics/loadImgs'
 import { StageBackground } from './StageBackground'
 import { BgParticle } from '@/sprites/bgs/BgParticle'
 import { themes } from '@/assets/StageThemeDef'
@@ -16,7 +16,7 @@ export class DuskSkyBg extends StageBackground {
    */
   async load() {
     const def = themes.dusk
-    this.addChild(await loadSprite(`${def.imgDir}/DuskSky.svg`, this.area.width, this.area.height))
+    await this.loadBg(`${def.imgDir}/DuskSky.svg`)
     const particleImgReqs = Array(5)
       .fill(0)
       .map((_, index) => ({ url: `${def.imgDir}/Bubble${index + 1}.svg` }))

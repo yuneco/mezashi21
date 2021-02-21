@@ -23,7 +23,7 @@ export class UniverseBg extends StageBackground {
    */
   async load() {
     const def = themes.univ
-    this.addChild(await loadSprite(`${def.imgDir}/UnivSky.svg`, this.area.width, this.area.height))
+    await this.loadBg(`${def.imgDir}/UnivSky.svg`)
     const asteroids = await loadSprite(`${def.imgDir}/Asteroids.svg`, this.area.width)
     asteroids.y = this.area.height - asteroids.height
     asteroids.filters = [new PaperFilter(1.5 + Math.random(), true)]

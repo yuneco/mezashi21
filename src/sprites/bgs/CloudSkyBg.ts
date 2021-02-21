@@ -15,8 +15,8 @@ export class CloudSkyBg extends StageBackground {
    * リソースをロードしてアニメーションを開始します。
    */
   async load() {
-    const IMGDIR = '/imgs/bg/Sky'
-    this.addChild(await loadSprite(`${IMGDIR}/BlueSky.svg`, this.area.width, this.area.height))
+    const IMGDIR = '/imgs/bg/sky'
+    await this.loadBg(`${IMGDIR}/BlueSky.svg`)
     const cloud1 = await loadSprite(`${IMGDIR}/Cloud1.svg`)
     const cloud2 = await loadSprite(`${IMGDIR}/Cloud2.svg`)
     cloud1.filters = [new PaperFilter(2.5, true)]

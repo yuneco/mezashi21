@@ -23,6 +23,7 @@
       />
       <GameStatusView v-show="state.statusVisible" />
       <CatGage v-show="state.statusVisible" />
+      <LoadGage v-show="state.preloadVisible" :progress="loadState.progress"></LoadGage>
     </GameStageOverlay>
   </div>
 </template>
@@ -40,6 +41,8 @@ import TitleView from './TitleView.vue'
 import GameOverView from './GameOverView.vue'
 import GameStatusView from './GameStatusView.vue'
 import CatGage from './CatGage.vue'
+import LoadGage from './LoadGage.vue'
+import { preloadAll } from '@/assets/preload'
 
 export default defineComponent({
   name: 'GameStage',
@@ -49,7 +52,8 @@ export default defineComponent({
     TitleView,
     GameOverView,
     GameStatusView,
-    CatGage
+    CatGage,
+    LoadGage
   },
   setup() {
     const store = useStore<StoreState>()
@@ -60,10 +64,15 @@ export default defineComponent({
       playState: computed(() => store.state.game.play),
       startLevel: 15
     })
+    const loadState = reactive({
+      loading: true,
+      progress: 0
+    })
     const state = reactive({
       titleVisible: computed(() => store.state.game.play === 'opening'),
       overVisible: computed(() => store.state.game.play === 'over'),
       statusVisible: computed(() => store.state.game.play === 'playing'),
+      preloadVisible: computed(() => store.state.game.play === 'opening' && loadState.loading),
       overlayClickable: computed(
         () => store.state.game.play === 'opening' || store.state.game.play === 'over'
       ),
@@ -71,6 +80,14 @@ export default defineComponent({
     })
     let game: GameStageClass | undefined = undefined
     const canvas = ref<HTMLCanvasElement>()
+
+    const preload = async () => {
+      await preloadAll(prog => {
+        loadState.progress = prog
+      })
+      loadState.loading = false
+    }
+    preload()
 
     const initGame = async () => {
       playSound('btn')
@@ -123,6 +140,7 @@ export default defineComponent({
     onMounted(initGame)
     return {
       state,
+      loadState,
       debug,
       canvas,
       newGame,

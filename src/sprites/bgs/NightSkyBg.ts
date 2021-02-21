@@ -15,8 +15,8 @@ export class NightSkyBg extends StageBackground {
    * リソースをロードしてアニメーションを開始します。
    */
   async load() {
-    const IMGDIR = '/imgs/bg/Night'
-    this.addChild(await loadSprite(`${IMGDIR}/NightSky.svg`, this.area.width, this.area.height))
+    const IMGDIR = '/imgs/bg/night'
+    await this.loadBg(`${IMGDIR}/NightSky.svg`)
     const cloud1 = await loadSprite(`${IMGDIR}/Cloud1.svg`, this.area.width)
     const cloud2 = await loadSprite(`${IMGDIR}/Cloud2.svg`, this.area.width)
     cloud1.filters = [new PaperFilter(2.5, true)]

@@ -11,7 +11,7 @@ export class WaterGrass extends PlanetItemBase {
 
   async load() {
     const def = items.waterGrass
-    const spStem = new PIXI.Sprite(await loadSvg(`${def.imgDir}/WarterGrassLeaf.svg`, 5, this.size))
+    const spStem = await this.loadItem(`${def.imgDir}/WarterGrassLeaf.svg`, 5, this.size)
     spStem.pivot.set(0.5, 1)
     spStem.position.set(-spStem.width / 2, -this.size)
 

@@ -11,8 +11,8 @@ export class RedFlower extends PlanetItemBase {
 
   async load() {
     const def = items.redFlower
-    const spFl = new PIXI.Sprite(await loadSvg(`${def.imgDir}/Flower.svg`, this.size / 4))
-    const spStem = new PIXI.Sprite(await loadSvg(`${def.imgDir}/Stem.svg`, 5, this.size))
+    const spFl = await this.loadItem(`${def.imgDir}/Flower.svg`, this.size / 4)
+    const spStem = await this.loadItem(`${def.imgDir}/Stem.svg`, 5, this.size)
     spFl.pivot.set(0.5, 1)
     spStem.pivot.set(0.5, 1)
     spStem.position.set(-spStem.width / 2, -this.size)
