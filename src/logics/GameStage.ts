@@ -218,11 +218,8 @@ export class GameStage {
       return
     }
 
-    if (this.background) {
-      this.background.destroy()
-      this.app.bgLayer.removeChild(this.background)
-    }
-
+    // 古いBGを退避して新しいBGに差し替え
+    const currentBg = this.background
     this.theme = theme
     this.background = bg
 
@@ -232,6 +229,11 @@ export class GameStage {
 
     await this.background.load()
     this.app.bgLayer.addChild(this.background)
+    // 新しいBGのロードが完了してから古いものを削除
+    if (currentBg) {
+      currentBg.destroy()
+      this.app.bgLayer.removeChild(currentBg)
+    }
   }
 
   private onTick() {

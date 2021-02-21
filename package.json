@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "imgs": "svgo -r -f public/imgs.org -o public/imgs; node tools/imglist.mjs",
-    "deploy": "imgs; build; firebase deploy --only hosting"
+    "deploy": "yarn imgs; yarn build; firebase deploy --only hosting"
   },
   "dependencies": {
     "@pixi/filter-adjustment": "^3.1.1",

@@ -186,7 +186,7 @@ export default defineComponent({
         font-size: min(4vw, 3vh);
       }
       input {
-        font-size: min(4vw, 3vh);
+        font-size: max(16px, min(4vw, 3vh));
       }
     }
     .tweeninfo {
