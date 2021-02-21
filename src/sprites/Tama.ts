@@ -136,7 +136,6 @@ export class Tama extends StyledContainer {
       playSt => {
         if (playSt === 'transition') {
           // レベルアップモーション
-          console.log('levelup motion')
           this.levelUpMotion()
         }
       }

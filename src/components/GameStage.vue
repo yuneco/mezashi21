@@ -12,14 +12,21 @@
       </div>
     </div>
     <canvas ref="canvas"></canvas>
-    <GameStageOverlay :clickable="state.overlayClickable">
+    <GameStageOverlay :clickable="state.overlayClickable" :blured="hasBgBlur">
       <CenterMsg />
-      <TitleView v-show="state.titleVisible" @playNormal="playNormal" @playRandom="playRandom" />
+      <TitleView
+        v-show="state.titleVisible"
+        @playNormal="playNormal"
+        @playRandom="playRandom"
+        @ranking="goToRanking"
+      />
+      <RankingView v-if="state.rankingVisible" @back="backToTitle" />
       <GameOverView
         v-show="state.overVisible"
         @back="backToTitle"
         @replayNormal="playNormal"
         @replayRandom="playRandom"
+        @ranking="goToRanking"
       />
       <GameStatusView v-show="state.statusVisible" />
       <CatGage v-show="state.statusVisible" />
@@ -42,7 +49,12 @@ import GameOverView from './GameOverView.vue'
 import GameStatusView from './GameStatusView.vue'
 import CatGage from './CatGage.vue'
 import LoadGage from './LoadGage.vue'
+import RankingView from './RankingView.vue'
 import { preloadAll } from '@/assets/preload'
+
+type LocalState = {
+  titleMode: 'home' | 'ranking'
+}
 
 export default defineComponent({
   name: 'GameStage',
@@ -53,7 +65,8 @@ export default defineComponent({
     GameOverView,
     GameStatusView,
     CatGage,
-    LoadGage
+    LoadGage,
+    RankingView
   },
   setup() {
     const store = useStore<StoreState>()
@@ -64,12 +77,20 @@ export default defineComponent({
       playState: computed(() => store.state.game.play),
       startLevel: 15
     })
+    const localState = reactive<LocalState>({
+      titleMode: 'home'
+    })
     const loadState = reactive({
       loading: true,
       progress: 0
     })
     const state = reactive({
-      titleVisible: computed(() => store.state.game.play === 'opening'),
+      titleVisible: computed(
+        () => store.state.game.play === 'opening' && localState.titleMode === 'home'
+      ),
+      rankingVisible: computed(
+        () => store.state.game.play === 'opening' && localState.titleMode === 'ranking'
+      ),
       overVisible: computed(() => store.state.game.play === 'over'),
       statusVisible: computed(() => store.state.game.play === 'playing'),
       preloadVisible: computed(() => store.state.game.play === 'opening' && loadState.loading),
@@ -78,6 +99,8 @@ export default defineComponent({
       ),
       mainColor: computed(() => num2cssColor(store.state.appcolor.border))
     })
+    const hasBgBlur = computed(() => state.rankingVisible)
+
     let game: GameStageClass | undefined = undefined
     const canvas = ref<HTMLCanvasElement>()
 
@@ -134,13 +157,21 @@ export default defineComponent({
     })
 
     const backToTitle = () => {
+      localState.titleMode = 'home'
+      store.dispatch('gameTop')
+    }
+
+    const goToRanking = () => {
+      localState.titleMode = 'ranking'
       store.dispatch('gameTop')
     }
 
     onMounted(initGame)
     return {
       state,
+      localState,
       loadState,
+      hasBgBlur,
       debug,
       canvas,
       newGame,
@@ -149,7 +180,8 @@ export default defineComponent({
       balletCountStr,
       playNormal,
       playRandom,
-      backToTitle
+      backToTitle,
+      goToRanking
     }
   }
 })

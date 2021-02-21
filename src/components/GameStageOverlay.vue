@@ -17,6 +17,10 @@ export default defineComponent({
     clickable: {
       type: Boolean,
       default: false
+    },
+    blured: {
+      type: Boolean,
+      default: false
     }
   },
   setup(props) {
@@ -27,7 +31,8 @@ export default defineComponent({
       top: `calc(50% - ${store.state.stageSetting.height / 2}px)`,
       width: store.state.stageSetting.width + 'px',
       height: store.state.stageSetting.height + 'px',
-      pointerEvents: props.clickable ? 'auto' : 'none'
+      pointerEvents: props.clickable ? 'auto' : 'none',
+      backdropFilter: props.blured ? 'blur(8px)' : 'blur(0)'
     }))
 
     const borderStyle = computed(() => ({
@@ -45,6 +50,7 @@ export default defineComponent({
 <style lang="scss" scoped>
 .GameStageOverlay {
   position: absolute;
+  transition: backdrop-filter 0.5s 0.3s;
   .borderLine {
     position: absolute;
     pointer-events: none;

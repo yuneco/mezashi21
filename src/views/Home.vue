@@ -12,7 +12,7 @@
         <!-- ノイズを生成する原始フィルター -->
         <feTurbulence
           type="turbulence"
-          baseFrequency="0.4 0.4"
+          baseFrequency="0.2 0.2"
           numOctaves="1"
           seed="1"
           stitchTiles="stitch"
@@ -20,7 +20,7 @@
           <!-- ノイズのシードを変化させる -->
         </feTurbulence>
         <!-- ノイズを元に画像を歪める -->
-        <feDisplacementMap in="SourceGraphic" scale="2" />
+        <feDisplacementMap in="SourceGraphic" scale="1" />
       </filter>
     </defs>
   </svg>

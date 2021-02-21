@@ -21,6 +21,9 @@
         <button @click="playNormal">Normal</button>
         <button @click="playRandom">Random</button>
       </div>
+      <div class="rankingButtons fulful">
+        <button @click="goRanking">Ranking</button>
+      </div>
     </div>
   </div>
 </template>
@@ -33,7 +36,7 @@ import playSound from '@/logics/playSound'
 
 export default defineComponent({
   name: 'TitleView',
-  emits: ['playNormal', 'playRandom'],
+  emits: ['playNormal', 'playRandom', 'ranking'],
   setup(_, ctx) {
     const store = useStore<StoreState>()
     const playNormal = () => {
@@ -46,9 +49,15 @@ export default defineComponent({
       playSound('btn')
       ctx.emit('playRandom')
     }
+    const goRanking = () => {
+      store.commit('setInitialTap')
+      playSound('btn')
+      ctx.emit('ranking')
+    }
     return {
       playNormal,
-      playRandom
+      playRandom,
+      goRanking
     }
   }
 })
