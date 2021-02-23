@@ -2,7 +2,7 @@ import { GameLevel } from '../GameLevel'
 
 const themeName = 'dusk'
 const baseClearScore = 20
-const baseCatSpeed = 0.43
+const baseCatSpeed = 0.38
 const baseCatInterval = 2.0
 
 // Lv21 - 25: DuskSky Stage
@@ -42,7 +42,7 @@ export const duskSkyStage: GameLevel[] = [
     planetItem: 'goldFlower',
     scoreToClear: baseClearScore,
     maxCatSpeed: baseCatSpeed * 1.15,
-    maxCatJump: 200,
+    maxCatJump: 2000,
     catBornInterval: baseCatInterval,
     satellaites: [
       {
@@ -69,7 +69,7 @@ export const duskSkyStage: GameLevel[] = [
     planetItem: 'waterGrass',
     scoreToClear: baseClearScore,
     maxCatSpeed: baseCatSpeed * 0.6,
-    maxCatJump: 2800,
+    maxCatJump: 1800,
     catBornInterval: baseCatInterval,
     satellaites: [
       {

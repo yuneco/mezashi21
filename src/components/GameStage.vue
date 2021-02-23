@@ -113,13 +113,15 @@ export default defineComponent({
     preload()
 
     const initGame = async () => {
-      playSound('btn')
       const canvasEl = canvas.value
       if (!canvasEl) {
         return
       }
       game = new GameStageClass(canvasEl)
       await game.load()
+      console.log(
+        '🐱🌟Hi, thanks for checking here. This game is made with Pixi.JS and Vue 3. All game logics and illustrations are written by yuneco. If you are interested, please follow @yuneco on Twitter!'
+      )
     }
 
     const newGame = async () => {

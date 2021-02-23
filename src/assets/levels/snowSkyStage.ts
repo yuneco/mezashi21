@@ -14,8 +14,8 @@ export const snowSkyStage: GameLevel[] = [
     planetImgName: 'Planet4',
     planetItem: 'ice',
     scoreToClear: baseClearScore,
-    maxCatSpeed: baseCatSpeed * 0.85,
-    maxCatJump: 200,
+    maxCatSpeed: baseCatSpeed * 0.8,
+    maxCatJump: 800,
     catBornInterval: baseCatInterval,
     satellaites: [
       {
@@ -34,8 +34,8 @@ export const snowSkyStage: GameLevel[] = [
     planetImgName: 'Planet4',
     planetItem: 'ice',
     scoreToClear: baseClearScore,
-    maxCatSpeed: baseCatSpeed * 0.85,
-    maxCatJump: 200,
+    maxCatSpeed: baseCatSpeed * 0.8,
+    maxCatJump: 800,
     catBornInterval: baseCatInterval,
     satellaites: [
       {
@@ -95,7 +95,7 @@ export const snowSkyStage: GameLevel[] = [
     planetItem: 'ice',
     scoreToClear: baseClearScore + 15,
     maxCatSpeed: baseCatSpeed,
-    maxCatJump: 400,
+    maxCatJump: 1200,
     catBornInterval: baseCatInterval * 0.5,
     satellaites: [
       {

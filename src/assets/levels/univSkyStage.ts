@@ -2,7 +2,7 @@ import { GameLevel } from '../GameLevel'
 
 const themeName = 'univ'
 const baseClearScore = 20
-const baseCatSpeed = 0.5
+const baseCatSpeed = 0.4
 const baseCatInterval = 1.8
 
 // Lv26 - 30: UnivSky Stage
@@ -62,7 +62,7 @@ export const univSkyStage: GameLevel[] = [
     planetItem: 'waterGrass',
     scoreToClear: baseClearScore,
     maxCatSpeed: baseCatSpeed * 0.4,
-    maxCatJump: 2800,
+    maxCatJump: 2200,
     catBornInterval: baseCatInterval,
     satellaites: [
       {
@@ -116,7 +116,7 @@ export const univSkyStage: GameLevel[] = [
     planetItem: 'goldFlower',
     scoreToClear: baseClearScore + 20,
     maxCatSpeed: baseCatSpeed * 1.1,
-    maxCatJump: 800,
+    maxCatJump: 1200,
     catBornInterval: baseCatInterval * 0.7,
     satellaites: [
       {

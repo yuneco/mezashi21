@@ -121,6 +121,9 @@ export default defineComponent({
       }
       .name {
         width: 40%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .level {
         width: 10%;

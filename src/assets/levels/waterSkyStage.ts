@@ -2,7 +2,7 @@ import { GameLevel } from '../GameLevel'
 
 const themeName = 'water'
 const baseClearScore = 20
-const baseCatSpeed = 0.39
+const baseCatSpeed = 0.37
 const baseCatInterval = 2.2
 
 // Lv16 - 20: WaterSky Stage
@@ -15,7 +15,7 @@ export const waterSkyStage: GameLevel[] = [
     planetItem: 'waterGrass',
     scoreToClear: baseClearScore,
     maxCatSpeed: baseCatSpeed * 0.85,
-    maxCatJump: 200,
+    maxCatJump: 1000,
     catBornInterval: baseCatInterval,
     satellaites: [
       {
@@ -35,7 +35,7 @@ export const waterSkyStage: GameLevel[] = [
     planetItem: 'waterGrass',
     scoreToClear: baseClearScore,
     maxCatSpeed: baseCatSpeed * 0.85,
-    maxCatJump: 200,
+    maxCatJump: 2000,
     catBornInterval: baseCatInterval,
     satellaites: [
       {
@@ -116,7 +116,7 @@ export const waterSkyStage: GameLevel[] = [
     planetItem: 'waterGrass',
     scoreToClear: baseClearScore + 15,
     maxCatSpeed: baseCatSpeed * 1.3,
-    maxCatJump: 400,
+    maxCatJump: 1000,
     catBornInterval: baseCatInterval * 0.5,
     satellaites: [
       {

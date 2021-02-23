@@ -98,7 +98,6 @@ export default createStore<State>({
       state.tama.dir = payload.dir
     },
     setGamePlayStatus(state, payload: { playStatus: PlayStatus }) {
-      console.log('Game Play Status', payload.playStatus)
       state.game.play = payload.playStatus
     },
     setTamaJumpCount(state, payload: { jumpCount: TamaJumpCount }) {
@@ -184,7 +183,6 @@ export default createStore<State>({
       const isRandom = ctx.state.game.isRandomLevel || level > maxLevel
       const stageLevel = isRandom ? randomIntBetween(0, maxLevel) : level
       ctx.commit('setGameLevel', { level, stageLevel })
-      console.log('Up', stageLevel, ctx.state.game.levelStage)
       ctx.commit('setTamaJumpCount', { jumpCount: 0 })
     },
     gameLevelChange(ctx, payload: { level: number }) {

@@ -8,7 +8,7 @@ import { randomBetween } from '@/utils/MathUtil'
 
 export const addCat = async (stage: GameStage) => {
   const cat = new Cat()
-  await cat.load()
+  stage.cats.push(cat)
 
   const levelNo = store.state.game.level
   const level = levels[levelNo] ?? unknownLevel
@@ -17,12 +17,13 @@ export const addCat = async (stage: GameStage) => {
   const shouldJump = level.maxCatJump > 0 && Math.random() > 0.5
   const jumpHeight = shouldJump ? level.maxCatJump * randomBetween(0.4, 1) : 0
 
-  stage.cats.push(cat)
   const isDirRight = Math.random() > 0.5
   cat.direction = isDirRight ? 'right' : 'left'
   cat.speed = catSpeed
   cat.jumpHeight = jumpHeight
   cat.angle = stage.tama.angle + randomBetween(90, 130) * (isDirRight ? 1 : -1)
+
+  await cat.load()
   stage.app.cameraLayer.addChild(cat)
   setOnPlanet(stage.planet, true, cat)
 }

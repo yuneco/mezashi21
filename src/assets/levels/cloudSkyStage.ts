@@ -53,7 +53,7 @@ export const cloudSkyStage: GameLevel[] = [
     planetImgName: 'Planet9',
     scoreToClear: baseClearScore + 3,
     maxCatSpeed: baseCatSpeed + 0.6,
-    maxCatJump: 500,
+    maxCatJump: 800,
     catBornInterval: baseCatInterval * 0.7,
     satellaites: [
       {
@@ -69,10 +69,11 @@ export const cloudSkyStage: GameLevel[] = [
     themeName,
     planetSize: 500,
     planetImgName: 'Planet6',
+    planetItem: 'redFlower',
     scoreToClear: baseClearScore + 15,
-    maxCatSpeed: baseCatSpeed + 0.2,
-    maxCatJump: 1500,
-    catBornInterval: baseCatInterval * 0.3,
+    maxCatSpeed: baseCatSpeed + 0.15,
+    maxCatJump: 1000,
+    catBornInterval: baseCatInterval * 0.5,
     satellaites: [
       {
         size: 120,

@@ -31,7 +31,7 @@ export const nightSkyStage: GameLevel[] = [
     planetImgName: 'Planet5',
     planetItem: 'redFlower',
     scoreToClear: baseClearScore + 1,
-    maxCatSpeed: baseCatSpeed * 0.7,
+    maxCatSpeed: baseCatSpeed * 0.6,
     maxCatJump: 1000,
     catBornInterval: baseCatInterval,
     satellaites: [
